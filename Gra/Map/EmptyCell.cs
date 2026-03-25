@@ -6,7 +6,7 @@ public class EmptyCell : Cell
     
     public override char GetSymbol() => ' ';
     public override bool IsPassable() => true;
-    public override Items TakeItem() => null; // jesli jest pusta to zwracamy null
+    public override Items TakeItem(int selected_spot) => null; // jesli jest pusta to zwracamy null
     public override Cell ReceiveItem(Items item)  // jesli przyjmujemy item 
     {
         ItemCell nowaKomorka = new ItemCell(X, Y); // tworzymy nowy obiekt ale o tym samym x i y

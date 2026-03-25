@@ -1,4 +1,5 @@
 ﻿using System;
+using Gra.Map; // Tu siedzi Dungeon, Builder i Director
 
 namespace Gra
 {
@@ -6,8 +7,15 @@ namespace Gra
     {
         static void Main(string[] args)
         {
-            Board board = new Board(20, 20);
-            board.start_game();
+            IDungeonBuilder builder = new DungeonBuilder();
+            DungeonDirector director = new DungeonDirector();
+            Dungeon dungeon = director.BuildLegioland(builder, 25, 15);
+
+            Player player = new Player(0, 0);
+
+            GameManager engine = new GameManager(player, dungeon);
+            
+            engine.StartGame();
         }
     }
 }

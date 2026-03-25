@@ -15,12 +15,12 @@ public class ItemCell : Cell
     }
 
     // implementacja podnoszenia przez gracza
-    public override Items TakeItem()
+    public override Items TakeItem(int selected_spot)
     {
         if (_items.Count > 0) // jesli cos na nas jest
         {
-            Items topItem = _items.Last(); // Bierzemy ostatni dodany element 
-            _items.RemoveAt(_items.Count - 1); // Usuwamy z listy na ziemi
+            Items topItem = _items[selected_spot]; // Bierzemy ostatni dodany element 
+            _items.RemoveAt(selected_spot); // Usuwamy z listy na ziemi
             return topItem; // Zwracamy do _gracz.PickUp()
         }
         return null; // Jak pusto, zwracamy null

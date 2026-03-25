@@ -19,6 +19,6 @@ public abstract class Cell // klasa po ktorej beda dziedziczyc przedmioty
     {
         return new List<string>(); // Domyślnie zwraca pustą listę
     }
-    public abstract Items TakeItem(); // funkcja ktora implementuje jesli gracz nacisnie E
+    public abstract Items TakeItem(int selected_spot); // funkcja ktora implementuje jesli gracz nacisnie E
     public abstract Cell ReceiveItem(Items item); // funkcja ktora implementuje opuszczanie na komorke itemu
 }
