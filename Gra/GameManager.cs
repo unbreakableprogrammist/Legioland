@@ -101,7 +101,7 @@ public class GameManager
         
         Console.ForegroundColor = ConsoleColor.Yellow; // Kolor Star Wars
         Console.WriteLine("\n\t\tDAWNO TEMU W ODLEGŁEJ GALAKTYCE... A MOŻE PRZY ŁAZIENKOWSKIEJ...\n");
-        Thread.Sleep(2000);
+        Thread.Sleep(1000);
 
         string historia = @"
                 EPIZOD I: POWRÓT KLUBU
@@ -126,7 +126,7 @@ public class GameManager
 
         foreach (char c in historia)
         {
-            Console.Write(c);
+            Console.Write(c); 
             Thread.Sleep(30); 
         }
         
@@ -168,7 +168,7 @@ public class GameManager
             if (i < itemsOnGround.Count)
             {
                 string prefix = (i == _player.SelectedGroundSlot) ? "-> " : "   ";
-                Console.Write($"{prefix}{itemsOnGround[i]} [Press E to equip]".PadRight(30));
+                Console.Write($"{prefix}{itemsOnGround[i]} [Press E to equip]".PadRight(35));
             }
             else Console.Write("".PadRight(30));
         }
@@ -197,7 +197,7 @@ public class GameManager
                 string prefix = (i == _player.SelectedInventorySlot) ? "-> " : "   ";
                 Console.Write($"{prefix}{_player.Backpack[i].Name}".PadRight(30));
             }
-            else Console.Write("".PadRight(30));
+            else Console.Write("".PadRight(35));
         }
 
         Console.SetCursorPosition(0, _dungeon.Height + 1);
