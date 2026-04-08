@@ -4,10 +4,12 @@ namespace Gra.Decorator;
 public class UnluckyDecorator : ItemDecorator
 {
     public UnluckyDecorator(Items item) : base(item) { }
-    
-    // Dokleja tekst do nazwy
-    public override string Name => base.Name + " (Pechowy)";
-    
-    // Odejmuje 5 od modyfikatora szczęścia oryginalnej broni
-    public override int LuckModifier => base.LuckModifier - 5;
+
+    public override string Name => base.Name + " (Unlucky)";
+
+    public override void Equip(Player player, bool toRightHand)
+    {
+        base.Equip(player, toRightHand);
+        player.Luck -= 5;
+    } 
 }

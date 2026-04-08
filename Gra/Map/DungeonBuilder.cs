@@ -1,3 +1,5 @@
+using Gra.Decorator;
+
 namespace Gra.Map;
 
 public class DungeonBuilder : IDungeonBuilder
@@ -164,7 +166,11 @@ public class DungeonBuilder : IDungeonBuilder
                     newWeapon = new Weapon("Odidja-Ofoe", 'O', 120, true);
                 else if (weaponLos == 2) 
                     newWeapon = new Weapon("Elitim", 'E', 25, false);
-                _dungeon.Grid[x, y] = _dungeon.Grid[x, y].ReceiveItem(newWeapon);
+
+                Items finalWeapon = newWeapon;
+                if (_rnd.Next(0, 100) <= 20) finalWeapon = new ShapeDecorator(finalWeapon);
+                if (_rnd.Next(0, 100) <= 20) finalWeapon = new UnluckyDecorator(finalWeapon);
+                _dungeon.Grid[x, y] = _dungeon.Grid[x, y].ReceiveItem(finalWeapon);
                 weaponsToPlace--;
             }
         }
