@@ -155,56 +155,69 @@ public class GameManager
         _dungeon.Draw(_player);
 
         int uiColumn = _dungeon.Width  + 20; 
+        int clearWidth = 60; // Zwiększona stała wartość czyszczenia (nadpisze wszystko)
 
         Console.SetCursorPosition(uiColumn, 0);
-        Console.Write("=== BOISKO (MAPA) ===");
+        Console.Write("=== BOISKO (MAPA) ===".PadRight(clearWidth));
         
         var itemsOnGround = _dungeon.Grid[_player.X, _player.Y].GetItemNames();
         _player.ClampGroundSelection(itemsOnGround.Count);
         int end_listing = Math.Max(itemsOnGround.Count, 7);
-        for (int i = 0; i < Math.Max(5,itemsOnGround.Count); i++)
+        
+        for (int i = 0; i < Math.Max(5, itemsOnGround.Count); i++)
         {
             Console.SetCursorPosition(uiColumn, i + 1);
             if (i < itemsOnGround.Count)
             {
                 string prefix = (i == _player.SelectedGroundSlot) ? "-> " : "   ";
-                Console.Write($"{prefix}{itemsOnGround[i]} [Press E to equip]".PadRight(35));
+                // Łączymy cały string i DOPIERO Wtedy padujemy do 60 znaków
+                Console.Write($"{prefix}{itemsOnGround[i]} [Press E to equip]".PadRight(clearWidth));
             }
-            else Console.Write("".PadRight(30));
+            else Console.Write("".PadRight(clearWidth)); // Czyści puste linie do końca
         }
 
         Console.SetCursorPosition(uiColumn, end_listing);
-        Console.Write($"PUNKTY: {_player.Points}  GOLE: {_player.Goals}   ");
+        Console.Write($"PUNKTY: {_player.Points}  GOLE: {_player.Goals}".PadRight(clearWidth));
+        
         Console.SetCursorPosition(uiColumn, 8);
-        Console.Write($"HP: {_player.Health}   STRENGHT : {_player.Strength}");
+        Console.Write($"HP: {_player.Health}   STRENGHT : {_player.Strength}".PadRight(clearWidth));
+        
+        // Obliczanie szczęścia z uwzględnieniem Dekoratorów (póki nie ma PustaReka)
+        int currentLuck = _player.Luck;
+        if (_player.LeftHand != null) currentLuck += _player.LeftHand.LuckModifier;
+        if (_player.RightHand != null && _player.RightHand != _player.LeftHand) 
+            currentLuck += _player.RightHand.LuckModifier;
+
         Console.SetCursorPosition(uiColumn, 9);
-        Console.Write($"Luck: {_player.Luck}  Wisdom: {_player.Wisdom}   ");
+        Console.Write($"Luck: {currentLuck}  Wisdom: {_player.Wisdom}".PadRight(clearWidth));
         
         Console.SetCursorPosition(uiColumn, 11);
         string lh = _player.LeftHand != null ? _player.LeftHand.Name : "Pusta";
         string rh = _player.RightHand != null ? _player.RightHand.Name : "Pusta";
-        Console.Write($"LEWA: {lh.PadRight(15)}");
+        Console.Write($"LEWA: {lh}".PadRight(clearWidth));
+        
         Console.SetCursorPosition(uiColumn, 12);
-        Console.Write($"PRAWA: {rh.PadRight(15)}");
+        Console.Write($"PRAWA: {rh}".PadRight(clearWidth));
 
         Console.SetCursorPosition(uiColumn, 13);
-        Console.Write("=== SKŁAD (PLECAK) ===");
+        Console.Write("=== SKŁAD (PLECAK) ===".PadRight(clearWidth));
         _player.ClampInventorySelection();
 
-        for (int i = 0; i < Math.Max(10,_player.Backpack.Count); i++)
+        for (int i = 0; i < Math.Max(10, _player.Backpack.Count); i++)
         {
             Console.SetCursorPosition(uiColumn, i + 14);
             if (i < _player.Backpack.Count)
             {
                 string prefix = (i == _player.SelectedInventorySlot) ? "-> " : "   ";
-                Console.Write($"{prefix}{_player.Backpack[i].Name}".PadRight(30));
+                Console.Write($"{prefix}{_player.Backpack[i].Name}".PadRight(clearWidth));
             }
-            else Console.Write("".PadRight(35));
+            else Console.Write("".PadRight(clearWidth));
         }
 
         Console.SetCursorPosition(0, _dungeon.Height + 1);
         Console.ForegroundColor = ConsoleColor.Red;
-        Console.Write(_statusMessage.PadRight(20));
+        // Console.WindowWidth - 1 gwarantuje, że wyczyścimy cały dół ekranu bez przeskakiwania do nowej linii
+        Console.Write(_statusMessage.PadRight(Console.WindowWidth - 1));
         Console.ResetColor();
     }
 }
