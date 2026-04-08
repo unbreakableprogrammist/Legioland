@@ -6,22 +6,22 @@ public abstract class Weapon : Items
     public bool IsTwoHanded { get; private set; } 
     
     private char _symbol; 
-    private string _baseName; // <-- TO JEST KLUCZOWE: Własne pole tylko dla broni
+    private string _baseName; 
 
     public Weapon(string name, char symbol, int damage, bool isTwoHanded) 
     {
-        _baseName = name; // Zmieniamy BaseName na _baseName
+        _baseName = name; 
         _symbol = symbol;
         Damage = damage; 
         IsTwoHanded = isTwoHanded;
     }
-
-    // Używamy naszego prywatnego _baseName
+    
     public override string Name => $"{_baseName} [Atk: {Damage}]"; 
 
     public override char GetSymbol() => _symbol; 
 
     public abstract int AcceptAttack(IAttackVisitor visitor);
+    public abstract int AcceptDefense(IDefenseVisitor visitor, Player player);
     
     public override void PickUp(Player player)
     {
@@ -67,6 +67,7 @@ public class HeavyWeapon : Weapon
         : base(name, symbol, damage, isTwoHanded) { }
 
     public override int AcceptAttack(IAttackVisitor visitor) => visitor.Visit(this);
+    public override int AcceptDefense(IDefenseVisitor visitor, Player player) => visitor.Visit(this, player);
 }
 
 public class LightWeapon : Weapon
@@ -75,6 +76,7 @@ public class LightWeapon : Weapon
         : base(name, symbol, damage, isTwoHanded) { }
 
     public override int AcceptAttack(IAttackVisitor visitor) => visitor.Visit(this);
+    public override int AcceptDefense(IDefenseVisitor visitor, Player player) => visitor.Visit(this, player);
 }
 
 public class MagicWeapon : Weapon
@@ -83,4 +85,5 @@ public class MagicWeapon : Weapon
         : base(name, symbol, damage, isTwoHanded) { }
 
     public override int AcceptAttack(IAttackVisitor visitor) => visitor.Visit(this);
+    public override int AcceptDefense(IDefenseVisitor visitor, Player player) => visitor.Visit(this, player);
 }

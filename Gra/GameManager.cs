@@ -143,7 +143,7 @@ public class GameManager
         _dungeon.Draw(_player);
 
         int uiColumn = _dungeon.Width  + 20; 
-        int clearWidth = 60; // Stała szerokość czyszczenia dla całego UI
+        int clearWidth = 60; 
 
         Console.SetCursorPosition(uiColumn, 0);
         // Dodany LEGIOLAND w tytule!
@@ -206,10 +206,8 @@ public class GameManager
             else Console.Write("".PadRight(30));
         }
 
-        // --- ZMIANA TUTAJ: Koniec z problemem znikającej linii i skaczącego ekranu ---
         Console.SetCursorPosition(0, _dungeon.Height + 2);
         Console.ForegroundColor = ConsoleColor.Red;
-        // Używamy stałej szerokości 80 znaków zamiast Console.WindowWidth
         Console.Write(_statusMessage.PadRight(30)); 
         Console.ResetColor();
     }
