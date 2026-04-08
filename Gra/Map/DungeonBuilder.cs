@@ -174,6 +174,34 @@ public class DungeonBuilder : IDungeonBuilder
 
         return this; 
     }
+
+    // --- NOWA METODA: DODAWANIE WROGÓW ---
+    public IDungeonBuilder AddEnemies(int count)
+    {
+        int enemiesToPlace = count;
+
+        while (enemiesToPlace > 0)
+        {
+            int x = _rnd.Next(0, _dungeon.Width);
+            int y = _rnd.Next(0, _dungeon.Height);
+
+            // Sprawdzamy, czy pole jest przejezdne i czy nie ma tam już innego wroga
+            if (_dungeon.Grid[x, y].IsPassable() && _dungeon.GetEnemyAt(x, y) == null)
+            {
+                Enemy newEnemy = null;
+                int enemyLos = _rnd.Next(0, 3);
+
+                // Losujemy typ przeciwnika z Twojego bestiariusza
+                if (enemyLos == 0) newEnemy = new ZlyPudel(x, y);
+                else if (enemyLos == 1) newEnemy = new Sedzia(x, y);
+
+                _dungeon.Enemies.Add(newEnemy);
+                enemiesToPlace--;
+            }
+        }
+
+        return this;
+    }
     
     public Dungeon GetResult()
     {

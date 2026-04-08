@@ -35,4 +35,16 @@ public abstract class ItemDecorator : Items
         // Jeśli byliśmy w plecaku, to się z niego usuwamy (bo bazowa broń usunęła tylko samą siebie)
         if (wasInBackpack) player.Backpack.Remove(this);
     }
+    
+    public override int AcceptAttack(IAttackVisitor visitor)
+    {
+        // Nie odwiedzamy dekoratora, tylko to, co jest w środku (broń)
+        // Ale przekazujemy wynik obliczony na podstawie statystyk TEGO dekoratora
+        return _wrapper.AcceptAttack(visitor); 
+    }
+
+    public override int AcceptDefense(IDefenseVisitor visitor, Player player)
+    {
+        return _wrapper.AcceptDefense(visitor, player);
+    }
 }

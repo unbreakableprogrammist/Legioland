@@ -19,8 +19,11 @@ public class Player
     public Items LeftHand { get; set; } = null;
     public Items RightHand { get; set; } = null;
     
-    // --- NOWE: Pamięta aktualnie wybrany atak! ---
+    // Pamięta aktualnie wybrany atak
     public IAttackVisitor CurrentAttack { get; set; } = new AtakZwyklyVisitor();
+    
+    // --- NOWE: Flaga trybu walki ---
+    public bool IsInCombatMode { get; set; } = false;
     
     public int SelectedInventorySlot { get; set; } = 0;
     public int SelectedGroundSlot { get; set; } = 0;

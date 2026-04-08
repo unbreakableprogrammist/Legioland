@@ -10,6 +10,7 @@ public interface IDungeonBuilder
     IDungeonBuilder AddCentralRoom(int width, int height);
     IDungeonBuilder AddItems(int lenght);
     IDungeonBuilder AddWeapons(int lenght);
+    IDungeonBuilder AddEnemies(int lenght); 
 
     Dungeon GetResult();
 }

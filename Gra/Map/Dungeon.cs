@@ -1,20 +1,21 @@
 namespace Gra.Map;
 
-/// <summary>
-/// Ta klasa implementuje obiekt ktory bedzie mapa 
-/// </summary>
-
 public class Dungeon
 {
-    public Cell[,] Grid { get; private set;} // dostepny dla wszytskich mapa 
+    public Cell[,] Grid { get; private set; }
     public int Width { get; private set; }
     public int Height { get; private set; }
+    
+    // Zmieniamy na 'private set', żeby nikt z zewnątrz nie mógł napisać dungeon.Enemies = null;
+    public List<Enemy> Enemies { get; private set; } = new List<Enemy>();
 
-    public Dungeon(int width, int height) // konstruktor 
+    public Dungeon(int width, int height)
     {
         Width = width;
         Height = height;
         Grid = new Cell[width, height];
+        // Inicjalizacja listy w konstruktorze - podwójne zabezpieczenie przed NullReference
+        Enemies = new List<Enemy>();
     }
     
     public bool CanEnter(int x, int y)
@@ -25,34 +26,56 @@ public class Dungeon
     
     public void Draw(Player player)
     {
-        // Ustawiamy kursor na początku, żeby nadpisywać starą mapę (unikamy migotania)
         Console.SetCursorPosition(0, 0);
 
         for (int y = 0; y < Height; y++)
         {
             for (int x = 0; x < Width; x++)
             {
-                // SPRAWDZAMY: Czy na tym polu stoi gracz?
+                // 1. PRIORYTET: Gracz
                 if (x == player.X && y == player.Y)
                 {
-                    Console.ForegroundColor = ConsoleColor.Cyan; // Kolor gracza
-                    Console.Write("P"); // Symbol gracza (możesz zmienić na swój)
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.Write("P");
                     Console.ResetColor();
                 }
                 else
                 {
-                    // Jeśli nie gracz, to rysujemy to, co siedzi w komórce
-                    char symbol = Grid[x, y].GetSymbol();
-                
-                    // Opcjonalnie: kolory dla różnych typów (ściana vs trawa)
-                    if (symbol == '#') Console.ForegroundColor = ConsoleColor.DarkGray;
-                
-                    Console.Write($"{symbol}");
-                    Console.ResetColor();
+                    // 2. PRIORYTET: Wróg
+                    Enemy enemy = GetEnemyAt(x, y);
+                    if (enemy != null)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.Write(enemy.Symbol); // Rysujemy symbol konkretnego wroga (np. 'S', 'K')
+                        Console.ResetColor();
+                    }
+                    else
+                    {
+                        // 3. PRIORYTET: Komórka mapy
+                        char symbol = Grid[x, y].GetSymbol();
+                        if (symbol == '#') Console.ForegroundColor = ConsoleColor.DarkGray;
+                        Console.Write(symbol);
+                        Console.ResetColor();
+                    }
                 }
             }
-            // Po narysowaniu całego rzędu X, przechodzimy do nowej linii
             Console.WriteLine();
         }
+    }
+
+    public Enemy GetEnemyAt(int x, int y)
+    {
+        // Programowanie defensywne: jeśli lista jakimś cudem jest nullem, nie syp błędem
+        if (Enemies == null) return null;
+
+        foreach (var enemy in Enemies)
+        {
+            // Sprawdzamy tylko żywych wrogów na konkretnych pozycjach
+            if (enemy != null && !enemy.IsDead && enemy.X == x && enemy.Y == y)
+            {
+                return enemy;
+            }
+        }
+        return null;
     }
 }
