@@ -101,7 +101,7 @@ public class GameManager
         
         Console.ForegroundColor = ConsoleColor.Yellow; // Kolor Star Wars
         Console.WriteLine("\n\t\tDAWNO TEMU W ODLEGŁEJ GALAKTYCE... A MOŻE PRZY ŁAZIENKOWSKIEJ...\n");
-        Thread.Sleep(1000);
+        //Thread.Sleep(1000);
 
         string historia = @"
                 EPIZOD I: POWRÓT KLUBU
@@ -127,7 +127,7 @@ public class GameManager
         foreach (char c in historia)
         {
             Console.Write(c); 
-            Thread.Sleep(30); 
+            //Thread.Sleep(30); 
         }
         
         Console.WriteLine("\nNaciśnij dowolny klawisz, aby zobaczyć sterowanie...");
@@ -177,12 +177,14 @@ public class GameManager
         Console.Write($"PUNKTY: {_player.Points}  GOLE: {_player.Goals}   ");
         Console.SetCursorPosition(uiColumn, 8);
         Console.Write($"HP: {_player.Health}   STRENGHT : {_player.Strength}");
+        Console.SetCursorPosition(uiColumn, 9);
+        Console.Write($"Luck: {_player.Luck}  Wisdom: {_player.Wisdom}   ");
         
-        Console.SetCursorPosition(uiColumn, 10);
+        Console.SetCursorPosition(uiColumn, 11);
         string lh = _player.LeftHand != null ? _player.LeftHand.Name : "Pusta";
         string rh = _player.RightHand != null ? _player.RightHand.Name : "Pusta";
         Console.Write($"LEWA: {lh.PadRight(15)}");
-        Console.SetCursorPosition(uiColumn, 11);
+        Console.SetCursorPosition(uiColumn, 12);
         Console.Write($"PRAWA: {rh.PadRight(15)}");
 
         Console.SetCursorPosition(uiColumn, 13);
