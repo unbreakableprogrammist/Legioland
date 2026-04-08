@@ -17,7 +17,6 @@ public abstract class ItemDecorator : Items
 
     public override void PickUp(Player player)
     {
-        // IGNORUJEMY bazowe PickUp. Sami dodajemy NASZ DEKORATOR do plecaka!
         player.Backpack.Add(this);
     }
 
@@ -28,11 +27,9 @@ public abstract class ItemDecorator : Items
         // Niech bazowa broń zrobi swoje (zdejmie inne bronie itp.)
         _wrapper.Equip(player, toRightHand);
         
-        // Jeśli bazowa broń wskoczyła w ręce, zamieniamy ją na nasz DEKORATOR!
         if (player.LeftHand == _wrapper) player.LeftHand = this;
         if (player.RightHand == _wrapper) player.RightHand = this;
         
-        // Jeśli byliśmy w plecaku, to się z niego usuwamy (bo bazowa broń usunęła tylko samą siebie)
         if (wasInBackpack) player.Backpack.Remove(this);
     }
 }

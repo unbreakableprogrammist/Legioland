@@ -11,7 +11,6 @@ public abstract class Cell // klasa po ktorej beda dziedziczyc przedmioty
         Y = y;
     }
 
-    // Każde pole musi umieć zwrócić swój znak i powiedzieć, czy można na nie wejść
     public abstract char GetSymbol(); // zwraca swoj symbol 
     public abstract bool IsPassable(); // mowi czy mozna na nia wejsc
     

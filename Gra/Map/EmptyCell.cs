@@ -11,7 +11,6 @@ public class EmptyCell : Cell
     {
         ItemCell nowaKomorka = new ItemCell(X, Y); // tworzymy nowy obiekt ale o tym samym x i y
         nowaKomorka.AddItem(item); // dodajemy na nia item 
-        // Zwracamy nową komórkę, żeby zastąpiła EmptyCell ItemCellem
         return nowaKomorka; 
     }
 }

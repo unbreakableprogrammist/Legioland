@@ -170,7 +170,6 @@ public class GameManager
             if (i < itemsOnGround.Count)
             {
                 string prefix = (i == _player.SelectedGroundSlot) ? "-> " : "   ";
-                // Łączymy cały string i DOPIERO Wtedy padujemy do 60 znaków
                 Console.Write($"{prefix}{itemsOnGround[i]} [Press E to equip]".PadRight(clearWidth));
             }
             else Console.Write("".PadRight(clearWidth)); // Czyści puste linie do końca
@@ -216,7 +215,6 @@ public class GameManager
 
         Console.SetCursorPosition(0, _dungeon.Height + 1);
         Console.ForegroundColor = ConsoleColor.Red;
-        // Console.WindowWidth - 1 gwarantuje, że wyczyścimy cały dół ekranu bez przeskakiwania do nowej linii
         Console.Write(_statusMessage.PadRight(Console.WindowWidth - 1));
         Console.ResetColor();
     }

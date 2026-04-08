@@ -57,7 +57,6 @@ namespace Gra.Movement
 
         public void Execute()
         {
-            // Sprawdzamy ile przedmiotów leży pod nogami
             int count = _dungeon.Grid[_player.X, _player.Y].GetItemNames().Count;
             if (count > 0)
             {

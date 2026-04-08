@@ -158,7 +158,6 @@ public class DungeonBuilder : IDungeonBuilder
             {
                 Weapon newWeapon = null;
             
-                // Losujemy, który to "ratownik" (Parametry: Nazwa, Znak, Obrażenia/Siła, CzyDwuręczna)
                 int weaponLos = _rnd.Next(0, 3);
                 if (weaponLos == 0) 
                     newWeapon = new Weapon("Josue", 'J', 100, true); 
@@ -175,7 +174,7 @@ public class DungeonBuilder : IDungeonBuilder
             }
         }
 
-        return this; // Łańcuchujemy!
+        return this;
     }
     
     public Dungeon GetResult()
