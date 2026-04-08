@@ -4,7 +4,7 @@ public abstract class Items
 {
     public virtual string Name { get; protected set; } 
     
-    public virtual int Damage => 0;
+    public virtual int Damage { get; protected set; } = 0;
     public virtual bool IsTwoHanded => false;
     public virtual int LuckModifier => 0; 
 

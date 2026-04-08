@@ -6,6 +6,7 @@ public class DungeonBuilder : IDungeonBuilder
 {
     private Dungeon _dungeon;
     private Random _rnd = new Random();
+    
     public IDungeonBuilder CreateEmptyDungeon(int width, int height)
     {
         _dungeon = new Dungeon(width, height);
@@ -80,7 +81,6 @@ public class DungeonBuilder : IDungeonBuilder
             int y = _rnd.Next(0, _dungeon.Height);
             if (_dungeon.Grid[x, y].IsPassable())
             {
-   
                 Items newItem = null;
                 int itemLos = _rnd.Next(0, 4);
                 if (itemLos == 0) newItem = new Points(3);
@@ -97,7 +97,6 @@ public class DungeonBuilder : IDungeonBuilder
 
     public IDungeonBuilder AddCentralRoom(int width, int height)
     {
-        // lewy gorny rog :
         int start_x = (_dungeon.Width - width) / 2;
         int start_y = (_dungeon.Height - height) / 2;
         
@@ -119,13 +118,12 @@ public class DungeonBuilder : IDungeonBuilder
 
     public IDungeonBuilder AddRooms()
     {
-        // 1. Losujemy ile komnat (pokoi/szatni/biur prezesa) chcemy wygenerować
         int numberOfRooms = _rnd.Next(4, 8); 
 
         for (int r = 0; r < numberOfRooms; r++)
         {
-            int roomWidth = _rnd.Next(4, 9);  // szerokość od 4 do 8
-            int roomHeight = _rnd.Next(4, 9); // wysokość od 4 do 8
+            int roomWidth = _rnd.Next(4, 9);  
+            int roomHeight = _rnd.Next(4, 9); 
 
             int start_x = _rnd.Next(1, _dungeon.Width - 2); 
             int start_y = _rnd.Next(1, _dungeon.Height - 2);
@@ -156,16 +154,15 @@ public class DungeonBuilder : IDungeonBuilder
 
             if (_dungeon.Grid[x, y].IsPassable())
             {
-                Weapon newWeapon = null;
+                Items newWeapon = null;
             
-                // Losujemy, który to "ratownik" (Parametry: Nazwa, Znak, Obrażenia/Siła, CzyDwuręczna)
                 int weaponLos = _rnd.Next(0, 3);
                 if (weaponLos == 0) 
-                    newWeapon = new Weapon("Josue", 'J', 100, true); 
+                    newWeapon = new MagicWeapon("Josue", 'J', 100, true); 
                 else if (weaponLos == 1) 
-                    newWeapon = new Weapon("Odidja-Ofoe", 'O', 120, true);
+                    newWeapon = new HeavyWeapon("Odidja-Ofoe", 'O', 120, true);
                 else if (weaponLos == 2) 
-                    newWeapon = new Weapon("Elitim", 'E', 25, false);
+                    newWeapon = new LightWeapon("Elitim", 'E', 25, false);
 
                 Items finalWeapon = newWeapon;
                 if (_rnd.Next(0, 100) <= 20) finalWeapon = new ShapeDecorator(finalWeapon);
@@ -175,7 +172,7 @@ public class DungeonBuilder : IDungeonBuilder
             }
         }
 
-        return this; // Łańcuchujemy!
+        return this; 
     }
     
     public Dungeon GetResult()

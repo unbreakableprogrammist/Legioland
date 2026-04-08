@@ -1,24 +1,29 @@
+
 namespace Gra;
 
-public class Weapon : Items 
+public abstract class Weapon : Items 
 {
-    public int Damage { get; private set; } // nasz damage ( teraz nie uzywany )
-    public bool IsTwoHanded { get; private set; } // dla itemkow dwu recznych
-    private char _symbol; // symbol wyswietlania
+    public bool IsTwoHanded { get; private set; } 
+    
+    private char _symbol; 
 
-    public Weapon(string name, char symbol, int damage, bool isTwoHanded) // konstruktor
+    public Weapon(string name, char symbol, int damage, bool isTwoHanded) 
     {
-        Name = name;
+        BaseName = name;
         _symbol = symbol;
-        Damage = damage;
+        Damage = damage; 
         IsTwoHanded = isTwoHanded;
     }
 
+    public override string Name => $"{BaseName} [Atk: {Damage}]";
+
     public override char GetSymbol() => _symbol; 
+
+    public abstract int AcceptAttack(IAttackVisitor visitor);
 
     public override void PickUp(Player player)
     {
-        player.Backpack.Add(this); // Po podniesieniu trafia do plecaka
+        player.Backpack.Add(this); 
     }
 
     public override void Equip(Player player, bool toRightHand) 
@@ -52,5 +57,28 @@ public class Weapon : Items
         }
         player.Backpack.Remove(this);
     }
-    
+}
+
+public class HeavyWeapon : Weapon
+{
+    public HeavyWeapon(string name, char symbol, int damage, bool isTwoHanded) 
+        : base(name, symbol, damage, isTwoHanded) { }
+
+    public override int AcceptAttack(IAttackVisitor visitor) => visitor.Visit(this);
+}
+
+public class LightWeapon : Weapon
+{
+    public LightWeapon(string name, char symbol, int damage, bool isTwoHanded) 
+        : base(name, symbol, damage, isTwoHanded) { }
+
+    public override int AcceptAttack(IAttackVisitor visitor) => visitor.Visit(this);
+}
+
+public class MagicWeapon : Weapon
+{
+    public MagicWeapon(string name, char symbol, int damage, bool isTwoHanded) 
+        : base(name, symbol, damage, isTwoHanded) { }
+
+    public override int AcceptAttack(IAttackVisitor visitor) => visitor.Visit(this);
 }
