@@ -11,4 +11,5 @@ public abstract class Items
     public abstract char GetSymbol(); 
     public abstract void PickUp(Player player); 
     public virtual void Equip(Player player, bool toRightHand) { }
+    public virtual int AcceptAttack(IAttackVisitor visitor) => visitor.Visit(this);
 }

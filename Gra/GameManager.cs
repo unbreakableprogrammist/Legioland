@@ -20,20 +20,16 @@ public class GameManager
     
     private void SetCommands()
     {
-         // WASD
         _commands.Add(ConsoleKey.W,new MoveCommand(_player,_dungeon,0,-1));
         _commands.Add(ConsoleKey.S,new MoveCommand(_player,_dungeon,0,1));
         _commands.Add(ConsoleKey.A,new MoveCommand(_player,_dungeon,-1,0));
         _commands.Add(ConsoleKey.D,new MoveCommand(_player,_dungeon,1,0));
-        // R i L
         _commands.Add(ConsoleKey.R,new EquipCommand(_player,true));
         _commands.Add(ConsoleKey.L,new EquipCommand(_player,false));
-        // strzalki
         _commands.Add(ConsoleKey.UpArrow,new InventoryUpCommand(_player));
         _commands.Add(ConsoleKey.DownArrow,new InventoryDownCommand(_player));
         _commands.Add(ConsoleKey.LeftArrow,new GroundSelectLeftCommand(_player,_dungeon));
         _commands.Add(ConsoleKey.RightArrow,new GroundSelectRightCommand(_player,_dungeon));
-        // E - podnies , F - pusc 
         _commands.Add(ConsoleKey.E,new PickUpCommand(_player,_dungeon));
         _commands.Add(ConsoleKey.F,new DropCommand(_player,_dungeon));
     }
@@ -50,10 +46,16 @@ public class GameManager
             Draw(); 
             ConsoleKeyInfo keyInfo = Console.ReadKey(true);
             if (keyInfo.Key == ConsoleKey.Q) break;
+            
+            // --- NOWE: Zmiana ataku "w locie" bez dedykowanych komend ---
+            if (keyInfo.Key == ConsoleKey.D1) { _player.CurrentAttack = new AtakZwyklyVisitor(); _statusMessage = "Styl walki: ZWYKŁY"; continue; }
+            if (keyInfo.Key == ConsoleKey.D2) { _player.CurrentAttack = new AtakSkrytyVisitor(); _statusMessage = "Styl walki: SKRYTY"; continue; }
+            if (keyInfo.Key == ConsoleKey.D3) { _player.CurrentAttack = new AtakMagicznyVisitor(); _statusMessage = "Styl walki: MAGICZNY"; continue; }
+
             if (_commands.ContainsKey(keyInfo.Key))
             {
                 _commands[keyInfo.Key].Execute();
-                _statusMessage = ""; // Czyścimy błąd po poprawnym ruchu
+                _statusMessage = ""; 
             }
             else
             {
@@ -76,20 +78,6 @@ public class GameManager
 | $$$/ \  $$$| $$_____/| $$| $$      | $$  | $$| $$ | $$ | $$| $$_____/         | $$| $$  | $$
 | $$/   \  $$|  $$$$$$$| $$|  $$$$$$$|  $$$$$$/| $$ | $$ | $$|  $$$$$$$         | $$|  $$$$$$/
 |__/     \__/ \_______/|__/ \_______/ \______/ |__/ |__/ |__/ \_______/         |__/ \______/ 
-                                                                                              
-                                                                                              
-                                                                                              
-       /$$                           /$$           /$$                                 /$$    
-      | $$                          |__/          | $$                                | $$    
-      | $$        /$$$$$$   /$$$$$$  /$$  /$$$$$$ | $$        /$$$$$$  /$$$$$$$   /$$$$$$$    
-      | $$       /$$__  $$ /$$__  $$| $$ /$$__  $$| $$       |____  $$| $$__  $$ /$$__  $$    
-      | $$      | $$$$$$$$| $$  \ $$| $$| $$  \ $$| $$        /$$$$$$$| $$  \ $$| $$  | $$    
-      | $$      | $$_____/| $$  | $$| $$| $$  | $$| $$       /$$__  $$| $$  | $$| $$  | $$    
-      | $$$$$$$$|  $$$$$$$|  $$$$$$$| $$|  $$$$$$/| $$$$$$$$|  $$$$$$$| $$  | $$|  $$$$$$$    
-      |________/ \_______/ \____  $$|__/ \______/ |________/ \_______/|__/  |__/ \_______/    
-                           /$$  \ $$                                                          
-                          |  $$$$$$/                                                          
-                           \______/                                                                                                                                                                                                                      
     ";
         Console.WriteLine(logo);
         Console.ResetColor();
@@ -99,9 +87,8 @@ public class GameManager
         while (Console.ReadKey(true).Key != ConsoleKey.Enter) { }
         Console.Clear();
         
-        Console.ForegroundColor = ConsoleColor.Yellow; // Kolor Star Wars
+        Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine("\n\t\tDAWNO TEMU W ODLEGŁEJ GALAKTYCE... A MOŻE PRZY ŁAZIENKOWSKIEJ...\n");
-        //Thread.Sleep(1000);
 
         string historia = @"
                 EPIZOD I: POWRÓT KLUBU
@@ -127,7 +114,6 @@ public class GameManager
         foreach (char c in historia)
         {
             Console.Write(c); 
-            //Thread.Sleep(30); 
         }
         
         Console.WriteLine("\nNaciśnij dowolny klawisz, aby zobaczyć sterowanie...");
@@ -142,12 +128,14 @@ public class GameManager
         Console.WriteLine("[T]               - Wyrzucenie przedmiotu z plecaka");
         Console.WriteLine("[L]               - Wyposażenie w lewą rękę");
         Console.WriteLine("[R]               - Wyposażenie w prawą rękę");
+        Console.WriteLine("[1, 2, 3]         - Zmiana stylu walki (Zwykły/Skryty/Magiczny)");
         Console.WriteLine("[Q]               - Poddanie meczu (Wyjście)");
 
         Console.WriteLine("\n\nWszystko jasne? Ruszajmy na boisko!");
         Console.WriteLine("Naciśnij dowolny klawisz, aby wybiec z tunelu...");
         Console.ReadKey(true);
     }
+    
     private void Draw()
     {
         Console.SetCursorPosition(0, 0);
@@ -155,10 +143,11 @@ public class GameManager
         _dungeon.Draw(_player);
 
         int uiColumn = _dungeon.Width  + 20; 
-        int clearWidth = 60; // Zwiększona stała wartość czyszczenia (nadpisze wszystko)
+        int clearWidth = 60; // Stała szerokość czyszczenia dla całego UI
 
         Console.SetCursorPosition(uiColumn, 0);
-        Console.Write("=== BOISKO (MAPA) ===".PadRight(clearWidth));
+        // Dodany LEGIOLAND w tytule!
+        Console.Write("=== LEGIOLAND (MAPA) ===".PadRight(clearWidth));
         
         var itemsOnGround = _dungeon.Grid[_player.X, _player.Y].GetItemNames();
         _player.ClampGroundSelection(itemsOnGround.Count);
@@ -170,55 +159,58 @@ public class GameManager
             if (i < itemsOnGround.Count)
             {
                 string prefix = (i == _player.SelectedGroundSlot) ? "-> " : "   ";
-                // Łączymy cały string i DOPIERO Wtedy padujemy do 60 znaków
-                Console.Write($"{prefix}{itemsOnGround[i]} [Press E to equip]".PadRight(clearWidth));
+                Console.Write($"{prefix}{itemsOnGround[i]} [Press E to equip]".PadRight(30));
             }
-            else Console.Write("".PadRight(clearWidth)); // Czyści puste linie do końca
+            else Console.Write("".PadRight(30)); 
         }
 
         Console.SetCursorPosition(uiColumn, end_listing);
-        Console.Write($"PUNKTY: {_player.Points}  GOLE: {_player.Goals}".PadRight(clearWidth));
+        Console.Write($"PUNKTY: {_player.Points}  GOLE: {_player.Goals}".PadRight(30));
         
         Console.SetCursorPosition(uiColumn, 8);
-        Console.Write($"HP: {_player.Health}   STRENGHT : {_player.Strength}".PadRight(clearWidth));
+        Console.Write($"HP: {_player.Health}   STRENGHT : {_player.Strength}".PadRight(30));
         
-        // Obliczanie szczęścia z uwzględnieniem Dekoratorów (póki nie ma PustaReka)
         int currentLuck = _player.Luck;
         if (_player.LeftHand != null) currentLuck += _player.LeftHand.LuckModifier;
         if (_player.RightHand != null && _player.RightHand != _player.LeftHand) 
             currentLuck += _player.RightHand.LuckModifier;
 
         Console.SetCursorPosition(uiColumn, 9);
-        Console.Write($"Luck: {currentLuck}  Wisdom: {_player.Wisdom}".PadRight(clearWidth));
+        Console.Write($"Luck: {currentLuck}  Wisdom: {_player.Wisdom}".PadRight(30));
         
-        Console.SetCursorPosition(uiColumn, 11);
+        Console.SetCursorPosition(uiColumn, 10);
+        Console.ForegroundColor = ConsoleColor.Magenta;
+        Console.Write($"STYL WALKI: {_player.CurrentAttack.GetType().Name}".PadRight(30));
+        Console.ResetColor();
+
+        Console.SetCursorPosition(uiColumn, 12);
         string lh = _player.LeftHand != null ? _player.LeftHand.Name : "Pusta";
         string rh = _player.RightHand != null ? _player.RightHand.Name : "Pusta";
-        Console.Write($"LEWA: {lh}".PadRight(clearWidth));
+        Console.Write($"LEWA: {lh}".PadRight(30));
         
-        Console.SetCursorPosition(uiColumn, 12);
-        Console.Write($"PRAWA: {rh}".PadRight(clearWidth));
-
         Console.SetCursorPosition(uiColumn, 13);
-        Console.Write("=== SKŁAD (PLECAK) ===".PadRight(clearWidth));
+        Console.Write($"PRAWA: {rh}".PadRight(30));
+
+        Console.SetCursorPosition(uiColumn, 15);
+        Console.Write("=== SKŁAD (PLECAK) ===".PadRight(30));
         _player.ClampInventorySelection();
 
         for (int i = 0; i < Math.Max(10, _player.Backpack.Count); i++)
         {
-            Console.SetCursorPosition(uiColumn, i + 14);
+            Console.SetCursorPosition(uiColumn, i + 16);
             if (i < _player.Backpack.Count)
             {
                 string prefix = (i == _player.SelectedInventorySlot) ? "-> " : "   ";
-                Console.Write($"{prefix}{_player.Backpack[i].Name}".PadRight(clearWidth));
+                Console.Write($"{prefix}{_player.Backpack[i].Name}".PadRight(30));
             }
-            else Console.Write("".PadRight(clearWidth));
+            else Console.Write("".PadRight(30));
         }
 
-        Console.SetCursorPosition(0, _dungeon.Height + 1);
+        // --- ZMIANA TUTAJ: Koniec z problemem znikającej linii i skaczącego ekranu ---
+        Console.SetCursorPosition(0, _dungeon.Height + 2);
         Console.ForegroundColor = ConsoleColor.Red;
-        // Console.WindowWidth - 1 gwarantuje, że wyczyścimy cały dół ekranu bez przeskakiwania do nowej linii
-        Console.Write(_statusMessage.PadRight(Console.WindowWidth - 1));
+        // Używamy stałej szerokości 80 znaków zamiast Console.WindowWidth
+        Console.Write(_statusMessage.PadRight(30)); 
         Console.ResetColor();
     }
 }
-

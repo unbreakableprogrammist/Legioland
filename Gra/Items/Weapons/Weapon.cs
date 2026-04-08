@@ -6,21 +6,23 @@ public abstract class Weapon : Items
     public bool IsTwoHanded { get; private set; } 
     
     private char _symbol; 
+    private string _baseName; // <-- TO JEST KLUCZOWE: Własne pole tylko dla broni
 
     public Weapon(string name, char symbol, int damage, bool isTwoHanded) 
     {
-        BaseName = name;
+        _baseName = name; // Zmieniamy BaseName na _baseName
         _symbol = symbol;
         Damage = damage; 
         IsTwoHanded = isTwoHanded;
     }
 
-    public override string Name => $"{BaseName} [Atk: {Damage}]";
+    // Używamy naszego prywatnego _baseName
+    public override string Name => $"{_baseName} [Atk: {Damage}]"; 
 
     public override char GetSymbol() => _symbol; 
 
     public abstract int AcceptAttack(IAttackVisitor visitor);
-
+    
     public override void PickUp(Player player)
     {
         player.Backpack.Add(this); 

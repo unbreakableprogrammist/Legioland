@@ -1,25 +1,26 @@
 using Gra.Map;
-
 namespace Gra;
 
 public class Player
 {
     public int X, Y;
-    public int Strength { get; set; } = 10; // sila 
-    public int Dexterity { get; set; } = 10; // zrecznosc
-    public int Health { get; set; } = 100; // zdrowie 
-    public int Luck { get; set; } = 5; // szczescie
-    public int Aggression { get; set; } = 5; // agresja 
-    public int Wisdom { get; set; } = 5; // madrosc 
+    public int Strength { get; set; } = 10; 
+    public int Dexterity { get; set; } = 10; 
+    public int Health { get; set; } = 100; 
+    public int Luck { get; set; } = 100; 
+    public int Aggression { get; set; } = 5; 
+    public int Wisdom { get; set; } = 5; 
 
     public int Points { get; set; } = 0; 
     public int Goals { get; set; } = 0;  
 
     public List<Items> Backpack { get; private set; } = new List<Items>();
 
-    // Ręce gracza
     public Items LeftHand { get; set; } = null;
     public Items RightHand { get; set; } = null;
+    
+    // --- NOWE: Pamięta aktualnie wybrany atak! ---
+    public IAttackVisitor CurrentAttack { get; set; } = new AtakZwyklyVisitor();
     
     public int SelectedInventorySlot { get; set; } = 0;
     public int SelectedGroundSlot { get; set; } = 0;
@@ -51,5 +52,4 @@ public class Player
         else if (SelectedGroundSlot >= itemsOnGroundCount) SelectedGroundSlot = itemsOnGroundCount - 1;
         else if (SelectedGroundSlot < 0) SelectedGroundSlot = 0;
     }
-    
 }
