@@ -13,7 +13,7 @@ public class EquipCommand : ICommand
 
     public void Execute()
     { 
-        if (_player.Backpack.Count > 0) // jesli cos mamy w plecaku 
+        if (_player.Backpack.Count > 0) 
         {
             Items item = _player.Backpack[_player.SelectedInventorySlot];
             item.Equip(_player, _rightHand);

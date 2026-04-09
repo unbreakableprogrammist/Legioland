@@ -1,5 +1,5 @@
 ﻿using System;
-using Gra.Map; // Tu siedzi Dungeon, Builder i Director
+using Gra.Map; 
 
 namespace Gra
 {

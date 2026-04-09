@@ -1,6 +1,6 @@
 namespace Gra.Decorator;
 
-// --- 1. PECHOWY DEKORATOR ---
+
 public class UnluckyDecorator : ItemDecorator
 {
     public UnluckyDecorator(Items item) : base(item) { }

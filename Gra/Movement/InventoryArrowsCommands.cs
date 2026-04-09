@@ -2,7 +2,7 @@ using Gra.Map;
 
 namespace Gra.Movement
 {
-    // Przewijanie plecaka w górę
+    
     public class InventoryUpCommand : ICommand
     {
         private Player _player;
@@ -23,7 +23,7 @@ namespace Gra.Movement
         }
     }
 
-    // Przewijanie plecaka w dół
+    
     public class InventoryDownCommand : ICommand
     {
         private Player _player;
@@ -57,12 +57,12 @@ namespace Gra.Movement
 
         public void Execute()
         {
-            // Sprawdzamy ile przedmiotów leży pod nogami
+            
             int count = _dungeon.Grid[_player.X, _player.Y].GetItemNames().Count;
             if (count > 0)
             {
                 _player.SelectedGroundSlot--;
-                if (_player.SelectedGroundSlot < 0) _player.SelectedGroundSlot = count - 1; // Zawijanie
+                if (_player.SelectedGroundSlot < 0) _player.SelectedGroundSlot = count - 1; 
             }
         }
     }
@@ -84,7 +84,7 @@ namespace Gra.Movement
             if (count > 0)
             {
                 _player.SelectedGroundSlot++;
-                if (_player.SelectedGroundSlot >= count) _player.SelectedGroundSlot = 0; // Zawijanie
+                if (_player.SelectedGroundSlot >= count) _player.SelectedGroundSlot = 0; 
             }
         }
     }

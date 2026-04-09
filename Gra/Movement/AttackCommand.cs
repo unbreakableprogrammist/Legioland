@@ -21,8 +21,6 @@ public class AttackCommand : ICommand
     {
         Enemy target = _dungeon.GetEnemyAt(_player.X, _player.Y);
         if (target == null) return;
-
-        // Logika Visitora (Atak)
         Items weapon = _useRightHand ? _player.RightHand : _player.LeftHand;
         int damage = (weapon != null) ? weapon.AcceptAttack(_player.CurrentAttack) : _player.Strength / 2;
         
@@ -32,12 +30,23 @@ public class AttackCommand : ICommand
         if (target.IsDead) 
         {
             report += "Wróg pokonany!";
-            // Dungeon.Enemies.Remove(target) powinna być w logice walki lub tutaj
+            
         }
         else 
         {
-            // Kontratak (Visitor Obrony)
-            int def = (_player.LeftHand != null) ? _player.LeftHand.AcceptDefense(target.AttackStyle, _player) : _player.Dexterity;
+            int def = 0;
+            if (_player.LeftHand != null) 
+            {
+                def = _player.LeftHand.AcceptDefense(target.AttackStyle, _player);
+            }
+            else if (_player.RightHand != null && _player.RightHand.IsTwoHanded)
+            {
+                def = _player.RightHand.AcceptDefense(target.AttackStyle, _player);
+            }
+            else 
+            {
+                def = _player.Dexterity;
+            }
             int taken = Math.Max(0, target.BaseDamage - def);
             _player.Health -= taken;
             report += $"| Otrzymałeś {taken} obr.";

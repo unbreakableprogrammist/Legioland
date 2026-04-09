@@ -1,6 +1,6 @@
 namespace Gra;
 
-// nieuzywane przedmioty po prostu maja imie symbol, na razie nie oplaca sie pisac oddzielnych klas do nich 
+
 public class Junk : Items
 {
     public Junk(string name, char symbol)

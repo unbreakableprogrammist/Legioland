@@ -20,7 +20,7 @@ public class GameManager
     
     private void SetCommands()
     {
-        // Podstawowe komendy (niezmienne)
+        
         _commands[ConsoleKey.W] = new MoveCommand(_player, _dungeon, 0, -1);
         _commands[ConsoleKey.S] = new MoveCommand(_player, _dungeon, 0, 1);
         _commands[ConsoleKey.A] = new MoveCommand(_player, _dungeon, -1, 0);
@@ -34,25 +34,22 @@ public class GameManager
         _commands[ConsoleKey.E] = new PickUpCommand(_player, _dungeon);
         _commands[ConsoleKey.F] = new DropCommand(_player, _dungeon);
 
-        // Komendy domyślne dla L i R (Ekwipunek)
+        
         _commands[ConsoleKey.R] = new EquipCommand(_player, true);
         _commands[ConsoleKey.L] = new EquipCommand(_player, false);
     }
 
-    // Metoda do przełączania trybu walki i podmieniania komend
+    
     private void ToggleCombatMode()
     {
         if (!_player.IsInCombatMode)
         {
-            // Próba wejścia w tryb walki - sprawdzamy czy pod graczem jest wróg
+            
             Enemy enemyOnTile = _dungeon.GetEnemyAt(_player.X, _player.Y);
             if (enemyOnTile != null)
             {
                 _player.IsInCombatMode = true;
                 _statusMessage = $"!!! TRYB WALKI: {enemyOnTile.Name.ToUpper()} !!!";
-
-                // PODMIANA: Teraz L i R to Atak
-                // Przekazujemy delegat (msg) => _statusMessage = msg, aby komenda mogła pisać do UI
                 _commands[ConsoleKey.R] = new AttackCommand(_player, _dungeon, true, (msg) => _statusMessage = msg);
                 _commands[ConsoleKey.L] = new AttackCommand(_player, _dungeon, false, (msg) => _statusMessage = msg);
             }
@@ -63,11 +60,11 @@ public class GameManager
         }
         else
         {
-            // Wyjście z trybu walki
+            
             _player.IsInCombatMode = false;
             _statusMessage = "Tryb eksploracji.";
 
-            // PRZYWRÓCENIE: Teraz L i R to Ekwipunek
+            
             _commands[ConsoleKey.R] = new EquipCommand(_player, true);
             _commands[ConsoleKey.L] = new EquipCommand(_player, false);
         }
@@ -86,12 +83,12 @@ public class GameManager
             ConsoleKeyInfo keyInfo = Console.ReadKey(true);
             if (keyInfo.Key == ConsoleKey.Q) break;
             
-            // --- TRYB WALKI - Zmiana Ataku (Klawisze 1, 2, 3) ---
+            
             if (keyInfo.Key == ConsoleKey.D1) { _player.CurrentAttack = new AtakZwyklyVisitor(); _statusMessage = "Styl walki: ZWYKŁY"; continue; }
             if (keyInfo.Key == ConsoleKey.D2) { _player.CurrentAttack = new AtakSkrytyVisitor(); _statusMessage = "Styl walki: SKRYTY"; continue; }
             if (keyInfo.Key == ConsoleKey.D3) { _player.CurrentAttack = new AtakMagicznyVisitor(); _statusMessage = "Styl walki: MAGICZNY"; continue; }
 
-            // --- KLAWISZ X: TRYB WALKI ---
+            
             if (keyInfo.Key == ConsoleKey.X)
             {
                 ToggleCombatMode();
@@ -100,7 +97,7 @@ public class GameManager
 
             if (_commands.ContainsKey(keyInfo.Key))
             {
-                // Blokada ruchu w trakcie walki
+                
                 if (_player.IsInCombatMode && (keyInfo.Key == ConsoleKey.W || keyInfo.Key == ConsoleKey.S || keyInfo.Key == ConsoleKey.A || keyInfo.Key == ConsoleKey.D))
                 {
                     _statusMessage = "Nie możesz się ruszyć w trakcie walki! Kliknij X, by uciec.";
@@ -108,7 +105,7 @@ public class GameManager
                 else
                 {
                     _commands[keyInfo.Key].Execute();
-                    // Czyścimy status tylko przy ruchu, żeby komunikaty z walki nie znikały od razu
+                    
                     if (!_player.IsInCombatMode) _statusMessage = ""; 
                 }
             }
@@ -129,7 +126,7 @@ public class GameManager
 
         Console.SetCursorPosition(uiColumn, 0);
         
-        // Dynamiczny nagłówek UI
+        
         if (_player.IsInCombatMode)
         {
             Console.BackgroundColor = ConsoleColor.DarkRed;
@@ -175,7 +172,7 @@ public class GameManager
         Console.Write($"STYL ATAKU: {_player.CurrentAttack.GetType().Name}".PadRight(clearWidth));
         Console.ResetColor();
 
-        // Wyświetlanie celu w walce
+        
         Console.SetCursorPosition(uiColumn, 11);
         if (_player.IsInCombatMode)
         {
@@ -231,7 +228,16 @@ public class GameManager
 | $$$/ \  $$$| $$_____/| $$| $$      | $$  | $$| $$ | $$ | $$| $$_____/         | $$| $$  | $$
 | $$/   \  $$|  $$$$$$$| $$|  $$$$$$$|  $$$$$$/| $$ | $$ | $$|  $$$$$$$         | $$|  $$$$$$/
 |__/     \__/ \_______/|__/ \_______/ \______/ |__/ |__/ |__/ \_______/         |__/ \______/ 
-    ";
+
+           /$$                     /$$           /$$                             /$$
+          | $$                    |__/          | $$                            | $$
+          | $$        /$$$$$$     /$$  /$$$$$$  | $$  /$$$$$$  /$$$$$$$   /$$$$$$$| $$
+          | $$       /$$__  $$   | $$ /$$__  $$ | $$ |____  $$| $$__  $$ /$$__  $$| $$
+          | $$      | $$$$$$$$   | $$| $$  \ $$ | $$  /$$$$$$$| $$  \ $$| $$  | $$|__/
+          | $$      | $$_____/   | $$| $$  | $$ | $$ /$$__  $$| $$  | $$| $$  | $$    
+          | $$$$$$$$|  $$$$$$$   | $$|  $$$$$$/ | $$|  $$$$$$$| $$  | $$|  $$$$$$$ /$$
+          |________/ \_______/   |__/ \______/  |__/ \_______/|__/  |__/ \_______/|__/
+";
         Console.WriteLine(logo);
         Console.ResetColor();
 
