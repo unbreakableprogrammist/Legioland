@@ -189,17 +189,13 @@ public class DungeonBuilder : IDungeonBuilder
             if (_dungeon.Grid[x, y].IsPassable() && _dungeon.GetEnemyAt(x, y) == null)
             {
                 Enemy newEnemy = null;
-                int enemyLos = _rnd.Next(0, 3);
-
-                
+                int enemyLos = _rnd.Next(0, 2);
                 if (enemyLos == 0) newEnemy = new ZlyPudel(x, y);
                 else if (enemyLos == 1) newEnemy = new Sedzia(x, y);
-
                 _dungeon.Enemies.Add(newEnemy);
                 enemiesToPlace--;
             }
         }
-
         return this;
     }
     

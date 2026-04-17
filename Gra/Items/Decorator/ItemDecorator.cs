@@ -17,29 +17,20 @@ public abstract class ItemDecorator : Items
 
     public override void PickUp(Player player)
     {
-        
         player.Backpack.Add(this);
     }
 
     public override void Equip(Player player, bool toRightHand)
     {
         bool wasInBackpack = player.Backpack.Contains(this);
-        
-        
         _wrapper.Equip(player, toRightHand);
-        
-        
         if (player.LeftHand == _wrapper) player.LeftHand = this;
         if (player.RightHand == _wrapper) player.RightHand = this;
-        
-        
         if (wasInBackpack) player.Backpack.Remove(this);
     }
     
     public override int AcceptAttack(IAttackVisitor visitor)
     {
-        
-        
         return _wrapper.AcceptAttack(visitor); 
     }
 
