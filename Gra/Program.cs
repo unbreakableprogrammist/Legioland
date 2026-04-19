@@ -7,6 +7,7 @@ namespace Gra
     {
         static void Main(string[] args)
         {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
             IDungeonBuilder builder = new DungeonBuilder();
             DungeonDirector director = new DungeonDirector();
             Dungeon dungeon = director.BuildLegioland(builder, 25, 15);

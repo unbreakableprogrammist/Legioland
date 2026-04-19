@@ -1,4 +1,5 @@
 using Gra.Decorator;
+using Gra.Map.Themes;
 
 namespace Gra.Map;
 
@@ -6,6 +7,11 @@ public class DungeonBuilder : IDungeonBuilder
 {
     private Dungeon _dungeon;
     private Random _rnd = new Random();
+    private readonly IThemeFactory _themeFactory;
+    public DungeonBuilder(IThemeFactory themeFactory)
+    {
+        _themeFactory = themeFactory;
+    }
     
     public IDungeonBuilder CreateEmptyDungeon(int width, int height)
     {
@@ -146,6 +152,7 @@ public class DungeonBuilder : IDungeonBuilder
     public IDungeonBuilder AddWeapons(int length)
     {
         int weaponsToPlace = length;
+        bool artifactPlaced = false;
 
         while (weaponsToPlace > 0)
         {
@@ -154,44 +161,40 @@ public class DungeonBuilder : IDungeonBuilder
 
             if (_dungeon.Grid[x, y].IsPassable())
             {
-                Items newWeapon = null;
+                Items newWeapon;
             
-                int weaponLos = _rnd.Next(0, 3);
-                if (weaponLos == 0) 
-                    newWeapon = new MagicWeapon("Josue", 'J', 100, true); 
-                else if (weaponLos == 1) 
-                    newWeapon = new HeavyWeapon("Odidja-Ofoe", 'O', 120, true);
-                else if (weaponLos == 2) 
-                    newWeapon = new LightWeapon("Elitim", 'E', 25, false);
+                if (!artifactPlaced)
+                {
+                    newWeapon = _themeFactory.CreateArtefact();
+                    artifactPlaced = true;
+                }
+                else
+                {
+                    newWeapon = _themeFactory.CreateRandomWeapon(_rnd);
+                }
+                
+                if (_rnd.Next(0, 100) <= 20) newWeapon = new ShapeDecorator(newWeapon);
+                if (_rnd.Next(0, 100) <= 20) newWeapon = new UnluckyDecorator(newWeapon);
 
-                Items finalWeapon = newWeapon;
-                if (_rnd.Next(0, 100) <= 20) finalWeapon = new ShapeDecorator(finalWeapon);
-                if (_rnd.Next(0, 100) <= 20) finalWeapon = new UnluckyDecorator(finalWeapon);
-                _dungeon.Grid[x, y] = _dungeon.Grid[x, y].ReceiveItem(finalWeapon);
+                _dungeon.Grid[x, y] = _dungeon.Grid[x, y].ReceiveItem(newWeapon);
                 weaponsToPlace--;
             }
         }
-
-        return this; 
+        return this;
     }
 
     
     public IDungeonBuilder AddEnemies(int count)
     {
         int enemiesToPlace = count;
-
         while (enemiesToPlace > 0)
         {
             int x = _rnd.Next(0, _dungeon.Width);
             int y = _rnd.Next(0, _dungeon.Height);
 
-            
             if (_dungeon.Grid[x, y].IsPassable() && _dungeon.GetEnemyAt(x, y) == null)
             {
-                Enemy newEnemy = null;
-                int enemyLos = _rnd.Next(0, 2);
-                if (enemyLos == 0) newEnemy = new ZlyPudel(x, y);
-                else if (enemyLos == 1) newEnemy = new Sedzia(x, y);
+                Enemy newEnemy = _themeFactory.CreateEnemy(x, y, _rnd);
                 _dungeon.Enemies.Add(newEnemy);
                 enemiesToPlace--;
             }

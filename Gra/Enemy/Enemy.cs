@@ -5,6 +5,7 @@ public abstract class Enemy
     public string Name { get; protected set; }
     public char Symbol { get; protected set; }
     public int Health { get; set; }
+    public int Armor { get; set; }
     public int BaseDamage { get; protected set; }
     public int X { get; set; }
     public int Y { get; set; }
