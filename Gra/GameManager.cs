@@ -131,7 +131,6 @@ public class GameManager
 
         Console.SetCursorPosition(uiColumn, 0);
         
-        
         if (_player.IsInCombatMode)
         {
             Console.BackgroundColor = ConsoleColor.DarkRed;
@@ -177,20 +176,20 @@ public class GameManager
         Console.Write($"STYL ATAKU: {_player.CurrentAttack.GetType().Name}".PadRight(clearWidth));
         Console.ResetColor();
 
-        
         Console.SetCursorPosition(uiColumn, 11);
-        if (_player.IsInCombatMode)
+        Enemy target = _dungeon.GetEnemyAt(_player.X, _player.Y);
+        
+        if (target != null)
         {
-            Enemy target = _dungeon.GetEnemyAt(_player.X, _player.Y);
-            if (target != null)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write($"CEL: {target.Name} (HP: {target.Health})".PadRight(clearWidth));
-                Console.ResetColor();
-            }
+            Console.ForegroundColor = ConsoleColor.Red;
+            string trybInfo = _player.IsInCombatMode ? "[WALKA]" : "[MOZLIWE]";
+            Console.Write($"{trybInfo} CEL: {target.Name} (HP: {target.Health} | Atk: {target.BaseDamage})".PadRight(clearWidth));
+            Console.ResetColor();
         }
-        else Console.Write("".PadRight(clearWidth));
-
+        else 
+        {
+            Console.Write("".PadRight(clearWidth));
+        }
         Console.SetCursorPosition(uiColumn, 13);
         string lh = _player.LeftHand != null ? _player.LeftHand.Name : "Pusta";
         string rh = _player.RightHand != null ? _player.RightHand.Name : "Pusta";
@@ -224,7 +223,6 @@ public class GameManager
         Console.Clear();
         Console.ForegroundColor = ConsoleColor.Green; 
 
-        // 1. Wczytanie LOGA (np. ASCII Art Legiolandu) z pliku Intro.txt
         if (File.Exists("Intro.txt"))
         {
             string logo = File.ReadAllText("Intro.txt");
@@ -243,22 +241,14 @@ public class GameManager
         
         Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine("\n\t\tDAWNO TEMU W ODLEGŁEJ GALAKTYCE... A MOŻE PRZY ŁAZIENKOWSKIEJ...\n\n");
-
-        // 2. Pobranie OPOWIEŚCI z wybranego Motywu (Fabryki)
         string opowiesc = _factory.GetIntroMessage();
-
-        // 3. Efekt animacji "STAR WARS" dla tekstu opowieści
         foreach (char c in opowiesc)
         {
-            Console.Write(c); 
-            
-            // Opóźnienie dla każdej litery (pomijamy spacje, by było płynniej)
+            Console.Write(c);
             if (c != ' ') 
             {
                 Thread.Sleep(30); 
             }
-
-            // Możliwość szybkiego pominięcia animacji klawiszem Spacji
             if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Spacebar)
             {
                 Console.Clear();

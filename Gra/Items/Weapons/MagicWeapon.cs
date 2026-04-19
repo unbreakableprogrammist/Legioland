@@ -1,9 +1,9 @@
 namespace Gra;
 
-public class HeavyWeapon : Weapon
+public class MagicWeapon : Weapon
 {
-    public override string TypBroni => "Ciężka";
-    public HeavyWeapon(string name, char symbol, int damage, bool isTwoHanded) 
+    public override string TypBroni => "Magiczna"; 
+    public MagicWeapon(string name, char symbol, int damage, bool isTwoHanded) 
         : base(name, symbol, damage, isTwoHanded) { }
 
     public override int AcceptAttack(IAttackVisitor visitor) => visitor.Visit(this);

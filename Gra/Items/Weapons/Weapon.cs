@@ -15,9 +15,8 @@ public abstract class Weapon : Items
         Damage = damage; 
         IsTwoHanded = isTwoHanded;
     }
-    
-    public override string Name => $"{_baseName} [Atk: {Damage}]"; 
-
+    public abstract string TypBroni { get; }
+    public override string Name => $"{_baseName} ({TypBroni}) [Atk: {Damage}]";
     public override char GetSymbol() => _symbol; 
 
     public abstract int AcceptAttack(IAttackVisitor visitor);
@@ -59,22 +58,4 @@ public abstract class Weapon : Items
         }
         player.Backpack.Remove(this);
     }
-}
-
-public class LightWeapon : Weapon
-{
-    public LightWeapon(string name, char symbol, int damage, bool isTwoHanded) 
-        : base(name, symbol, damage, isTwoHanded) { }
-
-    public override int AcceptAttack(IAttackVisitor visitor) => visitor.Visit(this);
-    public override int AcceptDefense(IDefenseVisitor visitor, Player player) => visitor.Visit(this, player);
-}
-
-public class MagicWeapon : Weapon
-{
-    public MagicWeapon(string name, char symbol, int damage, bool isTwoHanded) 
-        : base(name, symbol, damage, isTwoHanded) { }
-
-    public override int AcceptAttack(IAttackVisitor visitor) => visitor.Visit(this);
-    public override int AcceptDefense(IDefenseVisitor visitor, Player player) => visitor.Visit(this, player);
 }
