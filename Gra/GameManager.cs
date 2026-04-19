@@ -1,13 +1,16 @@
 using Gra.Map;
 using Gra.Map.Themes;
 using Gra.Movement;
+using Gra.Logging;
 using System.IO;         
 using System.Threading;   
 
 namespace Gra;
 
+
 public class GameManager
 {
+    private bool _showLogs = false; 
     private Dictionary<ConsoleKey, ICommand> _commands;
     private Player _player;
     private Dungeon _dungeon;
@@ -92,11 +95,15 @@ public class GameManager
             if (keyInfo.Key == ConsoleKey.D1) { _player.CurrentAttack = new AtakZwyklyVisitor(); _statusMessage = "Styl walki: ZWYKŁY"; continue; }
             if (keyInfo.Key == ConsoleKey.D2) { _player.CurrentAttack = new AtakSkrytyVisitor(); _statusMessage = "Styl walki: SKRYTY"; continue; }
             if (keyInfo.Key == ConsoleKey.D3) { _player.CurrentAttack = new AtakMagicznyVisitor(); _statusMessage = "Styl walki: MAGICZNY"; continue; }
-
-            
             if (keyInfo.Key == ConsoleKey.X)
             {
                 ToggleCombatMode();
+                continue;
+            }
+            if (keyInfo.Key == ConsoleKey.J)
+            {
+                _showLogs = !_showLogs; 
+                Console.Clear(); 
                 continue;
             }
 
@@ -120,8 +127,37 @@ public class GameManager
             }
         }
     }
-
+    
     private void Draw()
+    {
+        if (_showLogs)
+        {
+            DrawLogWindow();
+        }
+        else
+        {
+            DrawNormalGame(); // To jest Twoja obecna metoda Draw (cała mapa i UI)
+        }
+    }
+    private void DrawLogWindow()
+    {
+        Console.SetCursorPosition(0, 0);
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.WriteLine("=== DZIENNIK ZDARZEŃ LEGIOLANDU (Wciśnij J, aby wrócić) ===");
+        Console.ResetColor();
+        Console.WriteLine("------------------------------------------------------------");
+
+        var logs = Logger.Instance.GetLogs();
+    
+        // Wyświetlamy np. ostatnich 20 wpisów, żeby nie wyszło poza ekran
+        int start = Math.Max(0, logs.Count - 20);
+        for (int i = start; i < logs.Count; i++)
+        {
+            Console.WriteLine(logs[i]);
+        }
+    }
+
+    private void DrawNormalGame()
     {
         Console.SetCursorPosition(0, 0);
         _dungeon.Draw(_player);
