@@ -1,3 +1,4 @@
+using Gra.Logging;
 using Gra.Map;
 
 namespace Gra.Movement;
@@ -53,5 +54,6 @@ public class AttackCommand : ICommand
         }
 
         _onMessage(report);
+        Logger.Instance.Log($"Atak na {target.Name}! Zadano {damage} obrażeń.");
     }
 }

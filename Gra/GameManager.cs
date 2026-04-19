@@ -3,7 +3,8 @@ using Gra.Map.Themes;
 using Gra.Movement;
 using Gra.Logging;
 using System.IO;         
-using System.Threading;   
+using System.Threading;
+using Gra.Config;
 
 namespace Gra;
 
@@ -16,13 +17,15 @@ public class GameManager
     private Dungeon _dungeon;
     private string _statusMessage = ""; 
     IThemeFactory _factory;
+    private GameConfig _config;
 
-    public GameManager(Player player, Dungeon dungeon,IThemeFactory themeFactory)
+    public GameManager(Player player, Dungeon dungeon,IThemeFactory themeFactory,GameConfig config)
     {
         _player = player;
         _dungeon = dungeon;
         _commands = new Dictionary<ConsoleKey, ICommand>(); 
         _factory = themeFactory;
+        _config = config;
         SetCommands();
     }
     
@@ -87,6 +90,11 @@ public class GameManager
 
         while (true)
         {
+            if (_player.Health <= 0)
+            {
+                ShowGameOver();
+                break; 
+            }
             Draw(); 
             ConsoleKeyInfo keyInfo = Console.ReadKey(true);
             if (keyInfo.Key == ConsoleKey.Q) break;
@@ -316,5 +324,32 @@ public class GameManager
         Console.WriteLine("Naciśnij dowolny klawisz, aby wybiec z tunelu...");
         Console.ReadKey(true);
     }
-   
+    private void ShowGameOver()
+    {
+        Console.Clear();
+        Console.ForegroundColor = ConsoleColor.Red;
+        if (File.Exists("end.txt"))
+        {
+            Console.WriteLine(File.ReadAllText("end.txt"));
+        }
+        else
+        {
+            Console.WriteLine("======================================");
+            Console.WriteLine("          G A M E   O V E R           ");
+            Console.WriteLine("======================================");
+            Console.WriteLine("Twoja przygoda na Legiolandzie dobiegła końca...");
+        }
+
+        Console.ResetColor();
+        Console.WriteLine("\n--- PODSUMOWANIE SEZONU ---");
+        Console.WriteLine($"Zawodnik: {_config.PlayerName}");
+        Console.WriteLine($"Punkty: {_player.Points}");
+        Console.WriteLine($"Gole: {_player.Goals}");
+
+        Logger.Instance.Log($"KONIEC GRY. Gracz poległ. Punkty: {_player.Points}, Gole: {_player.Goals}");
+        Logger.Instance.SaveToFile(_config.PlayerName, _config.LogFilePath);
+        Console.WriteLine($"\n[Protokół meczowy (logi) został zapisany w: {_config.LogFilePath}]");
+        Console.WriteLine("\nNaciśnij dowolny klawisz, aby wyjść do szatni...");
+        Console.ReadKey(true);
+    }
 }

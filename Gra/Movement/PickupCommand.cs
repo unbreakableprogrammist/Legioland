@@ -1,3 +1,4 @@
+using Gra.Logging;
 using Gra.Map;
 
 namespace Gra.Movement;
@@ -23,5 +24,6 @@ public class PickUpCommand : ICommand
             podniesiony.PickUp(_player); 
             _player.ClampGroundSelection(cell.GetItemNames().Count); 
         }
+        Logger.Instance.Log($"Podniesiono przedmiot: {podniesiony.Name}");
     }
 }

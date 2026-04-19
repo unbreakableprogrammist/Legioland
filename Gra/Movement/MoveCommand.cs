@@ -1,3 +1,4 @@
+using Gra.Logging;
 using Gra.Map;
 
 namespace Gra.Movement;
@@ -20,6 +21,6 @@ public class MoveCommand : ICommand
     public void Execute()
     {
         _player.Move(_dungeon, _dx, _dy);
+        Logger.Instance.Log("Gracz przesunal sie na pole ({_x},{_y})");
     }
-    
 }

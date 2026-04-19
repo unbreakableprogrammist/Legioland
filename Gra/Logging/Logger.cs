@@ -23,7 +23,7 @@ public class Logger { // klasa jest dostepna z calego systemu
 
     public List<string> GetLogs() => _strategy?.GetLogs() ?? new List<string>();
 
-    public void Save(string pName, string path)
+    public void SaveToFile(string pName, string path)
     {
         _strategy?.SaveToFile(pName, path);
     }

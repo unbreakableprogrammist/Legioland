@@ -1,3 +1,5 @@
+using Gra.Logging;
+
 namespace Gra.Movement;
 
 public class EquipCommand : ICommand
@@ -18,6 +20,11 @@ public class EquipCommand : ICommand
             Items item = _player.Backpack[_player.SelectedInventorySlot];
             item.Equip(_player, _rightHand);
             _player.ClampInventorySelection();
+            Logger.Instance.Log($"Wyposazono: {item.Name} w reke {(_rightHand ? "Prawa" : "Lewa")}");
+        }
+        else 
+        {
+            Logger.Instance.Log("Proba wyposazenia przedmiotu, ale plecak jest pusty!");
         }
     }
 }
