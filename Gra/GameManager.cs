@@ -1,5 +1,8 @@
 using Gra.Map;
+using Gra.Map.Themes;
 using Gra.Movement;
+using System.IO;         
+using System.Threading;   
 
 namespace Gra;
 
@@ -9,12 +12,14 @@ public class GameManager
     private Player _player;
     private Dungeon _dungeon;
     private string _statusMessage = ""; 
+    IThemeFactory _factory;
 
-    public GameManager(Player player, Dungeon dungeon)
+    public GameManager(Player player, Dungeon dungeon,IThemeFactory themeFactory)
     {
         _player = player;
         _dungeon = dungeon;
         _commands = new Dictionary<ConsoleKey, ICommand>(); 
+        _factory = themeFactory;
         SetCommands();
     }
     
@@ -219,26 +224,16 @@ public class GameManager
         Console.Clear();
         Console.ForegroundColor = ConsoleColor.Green; 
 
-        string logo = @"
- /$$      /$$           /$$                                                   /$$$$$$$$       
-| $$  /$ | $$          | $$                                                  |__  $$__/       
-| $$ /$$$| $$  /$$$$$$ | $$  /$$$$$$$  /$$$$$$  /$$$$$$/$$$$   /$$$$$$          | $$  /$$$$$$ 
-| $$/$$ $$ $$ /$$__  $$| $$ /$$_____/ /$$__  $$| $$_  $$_  $$ /$$__  $$         | $$ /$$__  $$
-| $$$$_  $$$$| $$$$$$$$| $$| $$      | $$  \ $$| $$ \ $$ \ $$| $$$$$$$$         | $$| $$  \ $$
-| $$$/ \  $$$| $$_____/| $$| $$      | $$  | $$| $$ | $$ | $$| $$_____/         | $$| $$  | $$
-| $$/   \  $$|  $$$$$$$| $$|  $$$$$$$|  $$$$$$/| $$ | $$ | $$|  $$$$$$$         | $$|  $$$$$$/
-|__/     \__/ \_______/|__/ \_______/ \______/ |__/ |__/ |__/ \_______/         |__/ \______/ 
-
-           /$$                     /$$           /$$                             /$$
-          | $$                    |__/          | $$                            | $$
-          | $$        /$$$$$$     /$$  /$$$$$$  | $$  /$$$$$$  /$$$$$$$   /$$$$$$$| $$
-          | $$       /$$__  $$   | $$ /$$__  $$ | $$ |____  $$| $$__  $$ /$$__  $$| $$
-          | $$      | $$$$$$$$   | $$| $$  \ $$ | $$  /$$$$$$$| $$  \ $$| $$  | $$|__/
-          | $$      | $$_____/   | $$| $$  | $$ | $$ /$$__  $$| $$  | $$| $$  | $$    
-          | $$$$$$$$|  $$$$$$$   | $$|  $$$$$$/ | $$|  $$$$$$$| $$  | $$|  $$$$$$$ /$$
-          |________/ \_______/   |__/ \______/  |__/ \_______/|__/  |__/ \_______/|__/
-";
-        Console.WriteLine(logo);
+        // 1. Wczytanie LOGA (np. ASCII Art Legiolandu) z pliku Intro.txt
+        if (File.Exists("Intro.txt"))
+        {
+            string logo = File.ReadAllText("Intro.txt");
+            Console.WriteLine(logo);
+        }
+        else
+        {
+            Console.WriteLine("Brak pliku Intro.txt! Upewnij się, że jest w folderze z grą (Copy to Output Directory).");
+        }
         Console.ResetColor();
 
         Console.WriteLine("\n\t\t\t [ NACIŚNIJ ENTER, ABY ROZPOCZĄĆ PRZYGODĘ ]");
@@ -247,35 +242,35 @@ public class GameManager
         Console.Clear();
         
         Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine("\n\t\tDAWNO TEMU W ODLEGŁEJ GALAKTYCE... A MOŻE PRZY ŁAZIENKOWSKIEJ...\n");
+        Console.WriteLine("\n\t\tDAWNO TEMU W ODLEGŁEJ GALAKTYCE... A MOŻE PRZY ŁAZIENKOWSKIEJ...\n\n");
 
-        string historia = @"
-                EPIZOD I: POWRÓT KLUBU
-    
-         Wielka trwoga i zamęt opanowały zacne włości Legiolandu! 
-        Oto bowiem Zły Pudel, kudłaty tyran o sercu z kamienia, 
-        ład boiskowy zburzył i mrok na trybuny sprowadził. 
-        
-        Azaliż znajdzie się śmiałek, co godność herbu uratuje? 
-        Oto Ty, zacny Waszmość-Graczu, stajesz przed wyzwaniem!
-        Twoim zadaniem jest punkty i gole gromadzić, 
-        by chwałę dawną krainie owej przywrócić.
-        
-        W labiryntach owych skarby bezcenne odnajdziesz: 
-        mędrca Josue, walecznego Odidję-Ofoe oraz Elitima chyżego. 
-        Lecz strzeż się, mości panie, śmieci pospolitych! 
-        Rajovic i Rosołek niczym chwasty pod nogami 
-        plątać się będą, jeno miejsce w taborze marnując.
-        
-        Ruszaj tedy! Niechaj Legia będzie z Tobą!
-        ";
+        // 2. Pobranie OPOWIEŚCI z wybranego Motywu (Fabryki)
+        string opowiesc = _factory.GetIntroMessage();
 
-        foreach (char c in historia)
+        // 3. Efekt animacji "STAR WARS" dla tekstu opowieści
+        foreach (char c in opowiesc)
         {
             Console.Write(c); 
+            
+            // Opóźnienie dla każdej litery (pomijamy spacje, by było płynniej)
+            if (c != ' ') 
+            {
+                Thread.Sleep(30); 
+            }
+
+            // Możliwość szybkiego pominięcia animacji klawiszem Spacji
+            if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Spacebar)
+            {
+                Console.Clear();
+                Console.WriteLine("\n\t\tDAWNO TEMU W ODLEGŁEJ GALAKTYCE... A MOŻE PRZY ŁAZIENKOWSKIEJ...\n\n");
+                Console.WriteLine(opowiesc);
+                break;
+            }
         }
         
-        Console.WriteLine("\nNaciśnij dowolny klawisz, aby zobaczyć sterowanie...");
+        Console.ResetColor();
+
+        Console.WriteLine("\n\nNaciśnij dowolny klawisz, aby zobaczyć sterowanie...");
         Console.ReadKey(true);
         
         Console.Clear();
@@ -284,16 +279,16 @@ public class GameManager
         Console.WriteLine("[STRZAŁKI </>]    - Wybieranie przedmiotów na ziemi");
         Console.WriteLine("""[STRZAŁKI /|\ / \|/ ]    - Przeglądanie plecaka""");
         Console.WriteLine("[E]               - Podniesienie przedmiotu");
-        Console.WriteLine("[T]               - Wyrzucenie przedmiotu z plecaka");
+        Console.WriteLine("[F]               - Wyrzucenie przedmiotu z plecaka");
         Console.WriteLine("[L]               - Wyposażenie w lewą rękę");
         Console.WriteLine("[R]               - Wyposażenie w prawą rękę");
         Console.WriteLine("[1, 2, 3]         - Zmiana stylu walki (Zwykły/Skryty/Magiczny)");
+        Console.WriteLine("[X]               - Wejście/Wyjście z trybu walki");
         Console.WriteLine("[Q]               - Poddanie meczu (Wyjście)");
 
         Console.WriteLine("\n\nWszystko jasne? Ruszajmy na boisko!");
         Console.WriteLine("Naciśnij dowolny klawisz, aby wybiec z tunelu...");
         Console.ReadKey(true);
     }
-    
    
 }
