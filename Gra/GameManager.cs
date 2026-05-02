@@ -97,7 +97,11 @@ public class GameManager
             }
             Draw(); 
             ConsoleKeyInfo keyInfo = Console.ReadKey(true);
-            if (keyInfo.Key == ConsoleKey.Q) break;
+            if (keyInfo.Key == ConsoleKey.Q)
+            {
+                ShowGameOver();
+                break;
+            }
             
             
             if (keyInfo.Key == ConsoleKey.D1) { _player.CurrentAttack = new AtakZwyklyVisitor(); _statusMessage = "Styl walki: ZWYKŁY"; continue; }

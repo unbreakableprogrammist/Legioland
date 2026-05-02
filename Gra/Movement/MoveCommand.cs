@@ -21,6 +21,6 @@ public class MoveCommand : ICommand
     public void Execute()
     {
         _player.Move(_dungeon, _dx, _dy);
-        Logger.Instance.Log("Gracz przesunal sie na pole ({_x},{_y})");
+        Logger.Instance.Log($"Gracz przesunal sie na pole ({_player.X},{_player.Y})");
     }
 }
