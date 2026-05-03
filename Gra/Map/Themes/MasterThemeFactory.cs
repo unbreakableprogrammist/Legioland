@@ -1,4 +1,6 @@
 using System;
+using Gra.Map;
+using Gra.Observer;
 
 namespace Gra.Map.Themes;
 
@@ -10,12 +12,20 @@ public class MasterThemeFactory : IThemeFactory
     public Items CreateArtefact() => 
         new MagicWeapon("Marek Papszun", 'M', 200, true);
 
-    public Enemy CreateEnemy(int x, int y, Random rnd)
+    public Enemy CreateClubEnemy(int x, int y, Random rnd, ISubject<DeathPayload> deathNetwork, ISubject<SoundPayload> soundNetwork, Dungeon dungeon)
     {
         int los = rnd.Next(3);
-        if (los == 0) return new ThemedEnemy(x, y, "Lech Poznań", 'L', 150, 40, 20, new ObronaPrzedZwyklymVisitor());
-        if (los == 1) return new ThemedEnemy(x, y, "Jagiellonia Białystok", 'J', 140, 35, 15, new ObronaPrzedSkrytymVisitor());
-        return new ThemedEnemy(x, y, "Raków Częstochowa", 'R', 160, 1, 100, new ObronaPrzedZwyklymVisitor());
+        if (los == 0) return new ThemedEnemy(x, y, "Lech Poznań", 'L', 150, 40, 20, new ObronaPrzedZwyklymVisitor(), deathNetwork, soundNetwork, dungeon);
+        if (los == 1) return new ThemedEnemy(x, y, "Jagiellonia Białystok", 'J', 140, 35, 15, new ObronaPrzedSkrytymVisitor(), deathNetwork, soundNetwork, dungeon);
+        return new ThemedEnemy(x, y, "Raków Częstochowa", 'R', 160, 1, 100, new ObronaPrzedZwyklymVisitor(), deathNetwork, soundNetwork, dungeon);
+    }
+
+    public Enemy CreateOfficialEnemy(int x, int y, Random rnd, ISubject<DeathPayload> deathNetwork, ISubject<SoundPayload> soundNetwork, Dungeon dungeon)
+    {
+        int los = rnd.Next(3);
+        if (los == 0) return new OfficialEnemy(x, y, "Sędzia Ekstraklasy", 'S', 70, 15, 0, new ObronaPrzedZwyklymVisitor(), deathNetwork, soundNetwork, dungeon);
+        if (los == 1) return new OfficialEnemy(x, y, "Obserwator PZPN", 'O', 60, 10, 5, new ObronaPrzedSkrytymVisitor(), deathNetwork, soundNetwork, dungeon);
+        return new OfficialEnemy(x, y, "Prezes Ligi", 'P', 90, 25, 10, new ObronaPrzedMagicznymVisitor(), deathNetwork, soundNetwork, dungeon);
     }
 
     public Weapon CreateRandomWeapon(Random rnd)

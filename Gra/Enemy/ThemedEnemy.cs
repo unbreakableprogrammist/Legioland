@@ -19,6 +19,8 @@ public class ThemedEnemy : Enemy
 
     public override void OnNotify(DeathPayload message)
     {
-        Logger.Instance.Log($"Potwor {Name} zginal");
+        if (IsDead) return;
+        BaseDamage += 2; 
+        Logger.Instance.Log($"[GATUNEK] Zginął inny Klub! {Name} wpada w szał bojowy! Jego obrażenia rosną do {BaseDamage}.");
     }
 }
