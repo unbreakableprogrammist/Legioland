@@ -7,6 +7,7 @@ public abstract class Weapon : Items
     
     private char _symbol; 
     private string _baseName; 
+    public abstract int NoiseRange { get; } 
 
     public Weapon(string name, char symbol, int damage, bool isTwoHanded) 
     {

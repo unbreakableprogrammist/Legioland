@@ -2,7 +2,9 @@ namespace Gra;
 
 public class LightWeapon : Weapon
 {
-    public override string TypBroni => "Lekka"; 
+    public override string TypBroni => "Lekka";
+    public override int NoiseRange => 7;
+
     public LightWeapon(string name, char symbol, int damage, bool isTwoHanded) 
         : base(name, symbol, damage, isTwoHanded) { }
 

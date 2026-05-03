@@ -78,4 +78,41 @@ public class Dungeon
         }
         return null;
     }
+    
+    public int CalculatePathDistance(int startX, int startY, int targetX, int targetY, int maxRange)
+    {
+        if (startX == targetX && startY == targetY) return 0;
+
+        var queue = new Queue<(int x, int y, int dist)>();
+        var visited = new HashSet<(int, int)>();
+
+        queue.Enqueue((startX, startY, 0));
+        visited.Add((startX, startY));
+
+        int[] dx = { 0, 0, -1, 1 };
+        int[] dy = { -1, 1, 0, 0 };
+
+        while (queue.Count > 0)
+        {
+            var current = queue.Dequeue();
+
+            if (current.x == targetX && current.y == targetY)
+                return current.dist;
+
+            if (current.dist >= maxRange)
+                continue;
+
+            for (int i = 0; i < 4; i++)
+            {
+                int nx = current.x + dx[i];
+                int ny = current.y + dy[i];
+                if (nx >= 0 && nx < Width && ny >= 0 && ny < Height && !visited.Contains((nx, ny)) &&  Grid[nx, ny].IsPassable())
+                {
+                    visited.Add((nx, ny));
+                    queue.Enqueue((nx, ny, current.dist + 1));
+                }
+            }
+        }
+        return -1; // Nie znaleziono drogi w podanym zasięgu
+    }
 }

@@ -1,5 +1,6 @@
 using Gra.Logging;
 using Gra.Map;
+using Gra.Observer;
 
 namespace Gra.Movement;
 
@@ -7,11 +8,13 @@ public class PickUpCommand : ICommand
 {
     private Player _player;
     private Dungeon _dungeon;
+    private readonly ISubject<SoundPayload> _soundNetwork; 
 
-    public PickUpCommand(Player player, Dungeon dungeon)
+    public PickUpCommand(Player player, Dungeon dungeon, ISubject<SoundPayload> soundNetwork)
     {
         _player = player;
         _dungeon = dungeon;
+        _soundNetwork = soundNetwork; // przypsiujemy kanal na youtube 
     }
 
     public void Execute()
@@ -27,6 +30,12 @@ public class PickUpCommand : ICommand
         else 
         {
             Logger.Instance.Log("Gracz probowal cos podniesc, ale nic tam nie bylo.");
+        }
+
+        if (podniesiony is Weapon weapon)
+        {
+            var payload = new SoundPayload(_player.X,_player.Y,weapon.NoiseRange);
+            _soundNetwork.Notify(payload);
         }
     }
 }
