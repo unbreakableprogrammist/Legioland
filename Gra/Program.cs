@@ -4,6 +4,7 @@ using Gra.Config;
 using Gra.Map;
 using Gra.Map.Themes;
 using Gra.Logging;
+using Gra.Observer;
 
 namespace Gra
 {
@@ -16,6 +17,9 @@ namespace Gra
             var config = JsonSerializer.Deserialize<GameConfig>(jsonString);
             Logger.Instance.SetStrategy(new FileLoggerStrategy());
             Logger.Instance.Log($"--- START NOWEJ SESJI: {config.PlayerName} ---");
+            ISubject<SoundPayload> globalSoundNet = new NotificationSubject<SoundPayload>();
+            ISubject<DeathPayload> clubsNet = new NotificationSubject<DeathPayload>();
+            ISubject<DeathPayload> officialsNet = new NotificationSubject<DeathPayload>();
             IThemeFactory factory = config.Theme switch
             {
                 "Puchary" => new EuropeanCupFactory(),
@@ -24,12 +28,12 @@ namespace Gra
                 _ => new MasterThemeFactory() 
             };
 
-            IDungeonBuilder builder = new DungeonBuilder(factory);
+            IDungeonBuilder builder = new DungeonBuilder(factory,globalSoundNet, clubsNet, officialsNet); 
             DungeonDirector director = new DungeonDirector();
             Dungeon dungeon = director.BuildLegioland(builder, 25, 15);
 
             Player player = new Player(0, 0);
-            GameManager engine = new GameManager(player, dungeon, factory, config);
+            GameManager engine = new GameManager(player, dungeon, factory, config,globalSoundNet);
     
             engine.StartGame();
         }

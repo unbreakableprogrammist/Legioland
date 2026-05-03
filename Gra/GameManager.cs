@@ -5,6 +5,7 @@ using Gra.Logging;
 using System.IO;         
 using System.Threading;
 using Gra.Config;
+using Gra.Observer;
 
 namespace Gra;
 
@@ -18,14 +19,16 @@ public class GameManager
     private string _statusMessage = ""; 
     IThemeFactory _factory;
     private GameConfig _config;
+    private ISubject<SoundPayload> _soundNetwork;
 
-    public GameManager(Player player, Dungeon dungeon,IThemeFactory themeFactory,GameConfig config)
+    public GameManager(Player player, Dungeon dungeon,IThemeFactory themeFactory,GameConfig config,ISubject<SoundPayload> soundNetwork)
     {
         _player = player;
         _dungeon = dungeon;
         _commands = new Dictionary<ConsoleKey, ICommand>(); 
         _factory = themeFactory;
         _config = config;
+        _soundNetwork = soundNetwork;
         SetCommands();
     }
     
@@ -42,7 +45,7 @@ public class GameManager
         _commands[ConsoleKey.LeftArrow] = new GroundSelectLeftCommand(_player, _dungeon);
         _commands[ConsoleKey.RightArrow] = new GroundSelectRightCommand(_player, _dungeon);
         
-        _commands[ConsoleKey.E] = new PickUpCommand(_player, _dungeon);
+        _commands[ConsoleKey.E] = new PickUpCommand(_player, _dungeon,_soundNetwork);
         _commands[ConsoleKey.F] = new DropCommand(_player, _dungeon);
 
         
@@ -50,7 +53,13 @@ public class GameManager
         _commands[ConsoleKey.L] = new EquipCommand(_player, false);
     }
 
-    
+    private void MoveAllEnemies()
+    {
+        foreach (var enemy in _dungeon.Enemies)
+        {
+            if(!enemy.IsDead) enemy.Move(); 
+        }
+    }
     private void ToggleCombatMode()
     {
         if (!_player.IsInCombatMode)
@@ -129,8 +138,8 @@ public class GameManager
                 else
                 {
                     _commands[keyInfo.Key].Execute();
-                    
-                    if (!_player.IsInCombatMode) _statusMessage = ""; 
+                    if (!_player.IsInCombatMode) _statusMessage = "";
+                    MoveAllEnemies();
                 }
             }
             else
@@ -148,7 +157,7 @@ public class GameManager
         }
         else
         {
-            DrawNormalGame(); // To jest Twoja obecna metoda Draw (cała mapa i UI)
+            DrawNormalGame(); 
         }
     }
     private void DrawLogWindow()
@@ -161,7 +170,6 @@ public class GameManager
 
         var logs = Logger.Instance.GetLogs();
     
-        // Wyświetlamy np. ostatnich 20 wpisów, żeby nie wyszło poza ekran
         int start = Math.Max(0, logs.Count - 20);
         for (int i = start; i < logs.Count; i++)
         {

@@ -1,5 +1,7 @@
 using Gra.Decorator;
 using Gra.Map.Themes;
+using Gra.Observer;
+using System;
 
 namespace Gra.Map;
 
@@ -8,14 +10,27 @@ public class DungeonBuilder : IDungeonBuilder
     private Dungeon _dungeon;
     private Random _rnd = new Random();
     private readonly IThemeFactory _themeFactory;
-    public DungeonBuilder(IThemeFactory themeFactory)
+    
+    // Dodajemy referencje do naszych sieci powiadomień
+    private readonly ISubject<SoundPayload> _globalSoundNetwork;
+    private readonly ISubject<DeathPayload> _clubsNetwork;
+    private readonly ISubject<DeathPayload> _officialsNetwork;
+
+    public DungeonBuilder(IThemeFactory themeFactory, 
+                          ISubject<SoundPayload> globalSoundNetwork, 
+                          ISubject<DeathPayload> clubsNetwork, 
+                          ISubject<DeathPayload> officialsNetwork)
     {
         _themeFactory = themeFactory;
+        _globalSoundNetwork = globalSoundNetwork;
+        _clubsNetwork = clubsNetwork;
+        _officialsNetwork = officialsNetwork;
     }
     
     public IDungeonBuilder CreateEmptyDungeon(int width, int height)
     {
         _dungeon = new Dungeon(width, height);
+        // ... (bez zmian)
         for (int i = 0; i < width; i++)
         {
             for (int j = 0; j < height; j++)
@@ -28,6 +43,7 @@ public class DungeonBuilder : IDungeonBuilder
 
     public IDungeonBuilder CreateWallDungeon(int width, int height)
     {
+        // ... (bez zmian)
         _dungeon = new Dungeon(width, height);
         for (int i = 0; i < width; i++)
         {
@@ -41,6 +57,7 @@ public class DungeonBuilder : IDungeonBuilder
 
     public IDungeonBuilder AddCorridors(int lenght)
     {
+        // ... (bez zmian)
         int pos_x = 0;
         int pos_y = 0;
         int prev_x = 0;
@@ -52,25 +69,14 @@ public class DungeonBuilder : IDungeonBuilder
             int direction = _rnd.Next(0, 100);
             switch (direction)
             {
-                case <10:
-                    pos_y -= 1;
-                    break;
-                case >= 10 and < 40 :
-                    pos_x += 1;
-                    break;
-                case >= 40 and < 70:
-                    pos_x -= 1;
-                    break;
-                case >= 70:
-                    pos_y += 1;
-                    break;
+                case <10: pos_y -= 1; break;
+                case >= 10 and < 40: pos_x += 1; break;
+                case >= 40 and < 70: pos_x -= 1; break;
+                case >= 70: pos_y += 1; break;
             }
             if (pos_x < 0 || pos_x > _dungeon.Width - 1 || pos_y < 0 || pos_y > _dungeon.Height - 1)
             {
-                pos_x = prev_x;
-                pos_y = prev_y;
-                lenght++;
-                continue;
+                pos_x = prev_x; pos_y = prev_y; lenght++; continue;
             }
             _dungeon.Grid[pos_x, pos_y] = new EmptyCell(pos_x, pos_y);
         }
@@ -79,8 +85,8 @@ public class DungeonBuilder : IDungeonBuilder
 
     public IDungeonBuilder AddItems(int length)
     {
+        // ... (bez zmian)
         int number_of_items = _rnd.Next(5, length);
-
         while (number_of_items > 0)
         {
             int x = _rnd.Next(0, _dungeon.Width);
@@ -103,6 +109,7 @@ public class DungeonBuilder : IDungeonBuilder
 
     public IDungeonBuilder AddCentralRoom(int width, int height)
     {
+         // ... (bez zmian)
         int start_x = (_dungeon.Width - width) / 2;
         int start_y = (_dungeon.Height - height) / 2;
         
@@ -118,19 +125,17 @@ public class DungeonBuilder : IDungeonBuilder
                 _dungeon.Grid[i, j] = new EmptyCell(i, j);
             }
         }
-    
         return this;
     }
 
     public IDungeonBuilder AddRooms()
     {
+        // ... (bez zmian)
         int numberOfRooms = _rnd.Next(4, 8); 
-
         for (int r = 0; r < numberOfRooms; r++)
         {
             int roomWidth = _rnd.Next(4, 9);  
             int roomHeight = _rnd.Next(4, 9); 
-
             int start_x = _rnd.Next(1, _dungeon.Width - 2); 
             int start_y = _rnd.Next(1, _dungeon.Height - 2);
 
@@ -151,6 +156,7 @@ public class DungeonBuilder : IDungeonBuilder
     
     public IDungeonBuilder AddWeapons(int length)
     {
+        // ... (bez zmian)
         int weaponsToPlace = length;
         bool artifactPlaced = false;
 
@@ -162,7 +168,6 @@ public class DungeonBuilder : IDungeonBuilder
             if (_dungeon.Grid[x, y].IsPassable())
             {
                 Items newWeapon;
-            
                 if (!artifactPlaced)
                 {
                     newWeapon = _themeFactory.CreateArtefact();
@@ -183,10 +188,12 @@ public class DungeonBuilder : IDungeonBuilder
         return this;
     }
 
-    
+    // TĄ METODĘ ZMIENIAMY: Zapewniamy naprzemienne generowanie obu gatunków!
     public IDungeonBuilder AddEnemies(int count)
     {
         int enemiesToPlace = count;
+        int toggleGatunek = 0; // Będziemy przełączać: 0 = Klub, 1 = Sędzia
+
         while (enemiesToPlace > 0)
         {
             int x = _rnd.Next(0, _dungeon.Width);
@@ -194,7 +201,20 @@ public class DungeonBuilder : IDungeonBuilder
 
             if (_dungeon.Grid[x, y].IsPassable() && _dungeon.GetEnemyAt(x, y) == null)
             {
-                Enemy newEnemy = _themeFactory.CreateEnemy(x, y, _rnd);
+                Enemy newEnemy;
+
+                // Naprzemiennie generujemy przeciwników, żeby upewnić się, że będą reprezentanci obu gatunków
+                if (toggleGatunek == 0)
+                {
+                    newEnemy = _themeFactory.CreateClubEnemy(x, y, _rnd, _clubsNetwork, _globalSoundNetwork, _dungeon);
+                    toggleGatunek = 1;
+                }
+                else
+                {
+                    newEnemy = _themeFactory.CreateOfficialEnemy(x, y, _rnd, _officialsNetwork, _globalSoundNetwork, _dungeon);
+                    toggleGatunek = 0;
+                }
+
                 _dungeon.Enemies.Add(newEnemy);
                 enemiesToPlace--;
             }
