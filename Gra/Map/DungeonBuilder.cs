@@ -11,7 +11,6 @@ public class DungeonBuilder : IDungeonBuilder
     private Random _rnd = new Random();
     private readonly IThemeFactory _themeFactory;
     
-    // Dodajemy referencje do naszych sieci powiadomień
     private readonly ISubject<SoundPayload> _globalSoundNetwork;
     private readonly ISubject<DeathPayload> _clubsNetwork;
     private readonly ISubject<DeathPayload> _officialsNetwork;
@@ -30,7 +29,6 @@ public class DungeonBuilder : IDungeonBuilder
     public IDungeonBuilder CreateEmptyDungeon(int width, int height)
     {
         _dungeon = new Dungeon(width, height);
-        // ... (bez zmian)
         for (int i = 0; i < width; i++)
         {
             for (int j = 0; j < height; j++)
@@ -43,7 +41,6 @@ public class DungeonBuilder : IDungeonBuilder
 
     public IDungeonBuilder CreateWallDungeon(int width, int height)
     {
-        // ... (bez zmian)
         _dungeon = new Dungeon(width, height);
         for (int i = 0; i < width; i++)
         {
@@ -57,7 +54,6 @@ public class DungeonBuilder : IDungeonBuilder
 
     public IDungeonBuilder AddCorridors(int lenght)
     {
-        // ... (bez zmian)
         int pos_x = 0;
         int pos_y = 0;
         int prev_x = 0;
@@ -85,7 +81,6 @@ public class DungeonBuilder : IDungeonBuilder
 
     public IDungeonBuilder AddItems(int length)
     {
-        // ... (bez zmian)
         int number_of_items = _rnd.Next(5, length);
         while (number_of_items > 0)
         {
@@ -130,7 +125,6 @@ public class DungeonBuilder : IDungeonBuilder
 
     public IDungeonBuilder AddRooms()
     {
-        // ... (bez zmian)
         int numberOfRooms = _rnd.Next(4, 8); 
         for (int r = 0; r < numberOfRooms; r++)
         {
@@ -156,7 +150,6 @@ public class DungeonBuilder : IDungeonBuilder
     
     public IDungeonBuilder AddWeapons(int length)
     {
-        // ... (bez zmian)
         int weaponsToPlace = length;
         bool artifactPlaced = false;
 
@@ -188,11 +181,10 @@ public class DungeonBuilder : IDungeonBuilder
         return this;
     }
 
-    // TĄ METODĘ ZMIENIAMY: Zapewniamy naprzemienne generowanie obu gatunków!
     public IDungeonBuilder AddEnemies(int count)
     {
         int enemiesToPlace = count;
-        int toggleGatunek = 0; // Będziemy przełączać: 0 = Klub, 1 = Sędzia
+        int toggleGatunek = 0; 
 
         while (enemiesToPlace > 0)
         {
@@ -203,7 +195,6 @@ public class DungeonBuilder : IDungeonBuilder
             {
                 Enemy newEnemy;
 
-                // Naprzemiennie generujemy przeciwników, żeby upewnić się, że będą reprezentanci obu gatunków
                 if (toggleGatunek == 0)
                 {
                     newEnemy = _themeFactory.CreateClubEnemy(x, y, _rnd, _clubsNetwork, _globalSoundNetwork, _dungeon);
