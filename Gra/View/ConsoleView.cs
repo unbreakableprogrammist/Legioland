@@ -226,6 +226,7 @@ public class ConsoleView : IView
 
     public void ShowGameOver(string playerName, int points, int goals, string logFilePath, bool isDead)
     {
+        Console.CursorVisible = true;
         Console.Clear();
         Console.ForegroundColor = ConsoleColor.Red;
         if (File.Exists("end.txt"))

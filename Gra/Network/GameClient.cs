@@ -32,6 +32,8 @@ public class GameClient
             _reader = new StreamReader(stream);
 
             Console.WriteLine("Połączono z serwerem! Oczekiwanie na stan gry...");
+            Console.Clear();
+            Console.CursorVisible = false;
 
             // 1. Wątek nasłuchujący: Odbiera mapę od Serwera i każe Widokowi ją narysować
             Task.Run(ListenToServer);
@@ -62,6 +64,7 @@ public class GameClient
 
             if (keyInfo.Key == ConsoleKey.Q)
             {
+                Console.CursorVisible = true; 
                 Environment.Exit(0);
             } // Wyjście
 
@@ -76,12 +79,21 @@ public class GameClient
                 case ConsoleKey.D: action = new ClientActionDto { ActionType = "MOVE", Dx = 1, Dy = 0 }; break;
                 case ConsoleKey.E: action = new ClientActionDto { ActionType = "PICKUP" }; break;
                 case ConsoleKey.F: action = new ClientActionDto { ActionType = "DROP" }; break;
-                case ConsoleKey.L: action = new ClientActionDto { ActionType = "EQUIP_L" }; break;
-                case ConsoleKey.R: action = new ClientActionDto { ActionType = "EQUIP_R" }; break;
+                
+                // ZMIANA: Uniwersalne akcje dla rąk (Serwer sam zdecyduje czy to atak czy ekwipunek)
+                case ConsoleKey.L: action = new ClientActionDto { ActionType = "ACTION_L" }; break;
+                case ConsoleKey.R: action = new ClientActionDto { ActionType = "ACTION_R" }; break;
+                
                 case ConsoleKey.UpArrow: action = new ClientActionDto { ActionType = "INV_UP" }; break;
                 case ConsoleKey.DownArrow: action = new ClientActionDto { ActionType = "INV_DOWN" }; break;
                 case ConsoleKey.LeftArrow: action = new ClientActionDto { ActionType = "GND_LEFT" }; break;
                 case ConsoleKey.RightArrow: action = new ClientActionDto { ActionType = "GND_RIGHT" }; break;
+                
+                // NOWE KLAWISZE WALKI:
+                case ConsoleKey.X: action = new ClientActionDto { ActionType = "TOGGLE_COMBAT" }; break;
+                case ConsoleKey.D1: action = new ClientActionDto { ActionType = "STYLE_1" }; break;
+                case ConsoleKey.D2: action = new ClientActionDto { ActionType = "STYLE_2" }; break;
+                case ConsoleKey.D3: action = new ClientActionDto { ActionType = "STYLE_3" }; break;
             }
 
             if (action != null && _myPlayerId != -1)
@@ -102,7 +114,7 @@ public class GameClient
             {
                 string json = await _reader.ReadLineAsync();
                 if (json == null) break;
-
+ 
                 GameStateDto state = JsonSerializer.Deserialize<GameStateDto>(json);
 
                 // Mały trik na początku: Jeśli serwer wysłał nam graczy, a my jeszcze nie 
@@ -110,6 +122,14 @@ public class GameClient
                 if (_myPlayerId == -1 && state.Players.Count > 0)
                 {
                     _myPlayerId = state.Players[state.Players.Count - 1].Id;
+                }
+                PlayerDto myPlayer = state.Players.FirstOrDefault(p => p.Id == _myPlayerId);
+                if (myPlayer != null && myPlayer.Health <= 0)
+                {
+                    // Odpalamy widok końca gry
+                    _view.ShowGameOver($"Gracz {_myPlayerId}", myPlayer.Points, myPlayer.Goals, "logs.txt", true);
+                    Console.CursorVisible = true; // Odnawiamy kursor
+                    Environment.Exit(0);          // Zamykamy Klienta
                 }
 
                 // Każe ConsoleView narysować nowy stan!

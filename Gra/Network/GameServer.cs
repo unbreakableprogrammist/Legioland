@@ -24,15 +24,26 @@ public class GameServer
         // Rejestrujemy komendy
         _commandFactory = new Dictionary<string, Func<ClientActionDto, Player, ICommand>>
         {
-            { "MOVE", (dto, p) => new MoveCommand(p, _gameModel.Dungeon, dto.Dx, dto.Dy) },
-            { "PICKUP", (dto, p) => new PickUpCommand(p, _gameModel.Dungeon, _gameModel.SoundNetwork) },
-            { "DROP", (dto, p) => new DropCommand(p, _gameModel.Dungeon) },
-            { "EQUIP_L", (dto, p) => new EquipCommand(p, false) },
-            { "EQUIP_R", (dto, p) => new EquipCommand(p, true) },
+            { "MOVE", (dto, p) => p.IsInCombatMode ? null : new MoveCommand(p, _gameModel.Dungeon, dto.Dx, dto.Dy) },
+            { "PICKUP", (dto, p) => p.IsInCombatMode ? null : new PickUpCommand(p, _gameModel.Dungeon, _gameModel.SoundNetwork) },
+            { "DROP", (dto, p) => p.IsInCombatMode ? null : new DropCommand(p, _gameModel.Dungeon) },
+            
+            { "ACTION_L", (dto, p) => p.IsInCombatMode 
+                ? new AttackCommand(p, _gameModel.Dungeon, false, msg => { /* Na razie ignorujemy logi walki */ }) 
+                : new EquipCommand(p, false) },
+            { "ACTION_R", (dto, p) => p.IsInCombatMode 
+                ? new AttackCommand(p, _gameModel.Dungeon, true, msg => { }) 
+                : new EquipCommand(p, true) },
+            
             { "INV_UP", (dto, p) => new InventoryUpCommand(p) },
             { "INV_DOWN", (dto, p) => new InventoryDownCommand(p) },
             { "GND_LEFT", (dto, p) => new GroundSelectLeftCommand(p, _gameModel.Dungeon) },
-            { "GND_RIGHT", (dto, p) => new GroundSelectRightCommand(p, _gameModel.Dungeon) }
+            { "GND_RIGHT", (dto, p) => new GroundSelectRightCommand(p, _gameModel.Dungeon) },
+            
+            { "TOGGLE_COMBAT", (dto, p) => new ToggleCombatCommand(p, _gameModel.Dungeon) },
+            { "STYLE_1", (dto, p) => new ChangeStyleCommand(p, new AtakZwyklyVisitor()) },
+            { "STYLE_2", (dto, p) => new ChangeStyleCommand(p, new AtakSkrytyVisitor()) },
+            { "STYLE_3", (dto, p) => new ChangeStyleCommand(p, new AtakMagicznyVisitor()) }
         };
     }
     public void Start(int port)
