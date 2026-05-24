@@ -23,45 +23,6 @@ public class Dungeon
         if (x < 0 || x >= Width || y < 0 || y >= Height) return false;
         return Grid[x, y].IsPassable();
     }
-    
-    public void Draw(Player player)
-    {
-        Console.SetCursorPosition(0, 0);
-
-        for (int y = 0; y < Height; y++)
-        {
-            for (int x = 0; x < Width; x++)
-            {
-                
-                if (x == player.X && y == player.Y)
-                {
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.Write("P");
-                    Console.ResetColor();
-                }
-                else
-                {
-                    
-                    Enemy enemy = GetEnemyAt(x, y);
-                    if (enemy != null)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.Write(enemy.Symbol); 
-                        Console.ResetColor();
-                    }
-                    else
-                    {
-                        
-                        char symbol = Grid[x, y].GetSymbol();
-                        if (symbol == '#') Console.ForegroundColor = ConsoleColor.DarkGray;
-                        Console.Write(symbol);
-                        Console.ResetColor();
-                    }
-                }
-            }
-            Console.WriteLine();
-        }
-    }
 
     public Enemy GetEnemyAt(int x, int y)
     {
