@@ -1,12 +1,12 @@
 namespace Gra.Logging;
 
-public class Logger { // klasa jest dostepna z calego systemu 
-    private static Logger _instance; // trzymamy nasza instancje ktora jest statyczna 
-    private Logger() { } // prywatny konsturkor 
-    public static Logger Instance { // metoda ktora zwraca instancje loggera 
+public class Logger {
+    private static Logger _instance;
+    private Logger() { }
+    public static Logger Instance {
         get { 
-            if (_instance == null) _instance = new Logger(); // jesli jeszcze null stworz loger 
-            return _instance;  // w przecinym razie daj moja instancje
+            if (_instance == null) _instance = new Logger();
+            return _instance;
         }
     }
     private ILoggerStrategy _strategy;

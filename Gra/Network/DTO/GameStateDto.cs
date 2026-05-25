@@ -1,7 +1,5 @@
 namespace Gra.Network.DTO;
 
-// obiekt do ktorego beda pakowane dane do wyslania do klienta zeby ConsoleView narysowal 
-// Główny obiekt przesyłany z Serwera do Klientów
 public class GameStateDto
 {
     public List<PlayerDto> Players { get; set; } = new List<PlayerDto>();
@@ -20,21 +18,19 @@ public class PlayerDto
     public int Y { get; set; }
     public char Symbol { get; set; } 
         
-    // Statystyki do UI
     public int Health { get; set; }
     public int Points { get; set; }
     public int Goals { get; set; }
+    public string StatusMessage { get; set; }
     public int Strength { get; set; }
     public int TotalLuck { get; set; }
     public int Wisdom { get; set; }
         
-    // Ekwipunek i status jako stringi (bo widok potrzebuje tylko tekstu)
     public string AttackStyleName { get; set; }
     public string LeftHandName { get; set; }
     public string RightHandName { get; set; }
     public List<string> BackpackNames { get; set; } = new List<string>();
         
-    // Sterowanie UI
     public bool IsInCombatMode { get; set; }
     public int SelectedInventorySlot { get; set; }
     public int SelectedGroundSlot { get; set; }

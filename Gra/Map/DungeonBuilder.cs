@@ -104,7 +104,6 @@ public class DungeonBuilder : IDungeonBuilder
 
     public IDungeonBuilder AddCentralRoom(int width, int height)
     {
-         // ... (bez zmian)
         int start_x = (_dungeon.Width - width) / 2;
         int start_y = (_dungeon.Height - height) / 2;
         

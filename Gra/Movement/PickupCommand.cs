@@ -14,7 +14,7 @@ public class PickUpCommand : ICommand
     {
         _player = player;
         _dungeon = dungeon;
-        _soundNetwork = soundNetwork; // przypsiujemy kanal na youtube 
+        _soundNetwork = soundNetwork;
     }
 
     public void Execute()

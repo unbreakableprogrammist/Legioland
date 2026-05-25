@@ -8,7 +8,7 @@ namespace Gra.Model;
 public class GameModel
 {
     public Dungeon Dungeon { get; set; }
-    public Dictionary<int, Player> Players { get; set; } = new Dictionary<int, Player>(); // numerek -> obiekt 
+    public Dictionary<int, Player> Players { get; set; } = new Dictionary<int, Player>();
     public ISubject<SoundPayload> SoundNetwork { get; private set; }
     public GameModel(Dungeon dungeon, ISubject<SoundPayload> soundNetwork)
     {
@@ -43,7 +43,6 @@ public class GameModel
     {
         return Logger.Instance.GetLogs();
     }
-    // konwersja na 5 
     public GameStateDto ToDto()
     {
         var dto = new GameStateDto
@@ -53,12 +52,10 @@ public class GameModel
             Logs = GetLogs()
         };
 
-        // Pakowanie Graczy
         foreach (var kvp in Players)
         {
             Player p = kvp.Value;
             
-            // Obliczamy całkowite szczęście, tak by klient nie musiał tego robić
             int currentLuck = p.Luck;
             if (p.LeftHand != null) currentLuck += p.LeftHand.LuckModifier;
             if (p.RightHand != null && p.RightHand != p.LeftHand) currentLuck += p.RightHand.LuckModifier;
@@ -68,10 +65,11 @@ public class GameModel
                 Id = kvp.Key,
                 X = p.X,
                 Y = p.Y,
-                Symbol = kvp.Key.ToString()[0], // np. klucz 1 zamieni się w char '1'
+                Symbol = kvp.Key.ToString()[0],
                 Health = p.Health,
                 Points = p.Points,
                 Goals = p.Goals,
+                StatusMessage = p.StatusMessage,
                 Strength = p.Strength,
                 TotalLuck = currentLuck,
                 Wisdom = p.Wisdom,
@@ -85,7 +83,6 @@ public class GameModel
             });
         }
 
-        // Pakowanie Przeciwników
         foreach (var e in Dungeon.Enemies)
         {
             if (!e.IsDead)
@@ -102,7 +99,6 @@ public class GameModel
             }
         }
 
-        // Pakowanie Mapy i Przedmiotów na ziemi
         dto.Map = new CellDto[Dungeon.Width][];
         for (int x = 0; x < Dungeon.Width; x++)
         {

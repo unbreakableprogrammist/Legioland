@@ -2,14 +2,12 @@ using Gra.Map;
 using Gra.Network.DTO;
 
 namespace Gra.View;
-// klasa ktorej obiekt bedzie zajmowal sie rysowaniem na konsole
 public class ConsoleView : IView
     {
         public void Render(GameStateDto state, int localPlayerId, string statusMessage, bool showLogs)
         {
             if (showLogs)
             {
-                // Logi są teraz w obiekcie state.Logs
                 DrawLogsWindow(state.Logs);
             }
             else
@@ -35,25 +33,20 @@ public class ConsoleView : IView
 
         private void DrawNormalGame(GameStateDto state, int localPlayerId, string statusMessage)
         {
-            // Znajdujemy gracza, w którego się wcielamy (dla UI)
             PlayerDto myPlayer = state.Players.FirstOrDefault(p => p.Id == localPlayerId);
-            if (myPlayer == null) return; // Zapobiega błędom, gdy gracza nie ma
+            if (myPlayer == null) return;
 
             Console.SetCursorPosition(0, 0);
             
-            // 1. RYSOWANIE MAPY NA PODSTAWIE DTO
             for (int y = 0; y < state.MapHeight; y++)
             {
                 for (int x = 0; x < state.MapWidth; x++)
                 {
-                    // Sprawdzamy czy na tym polu jest jakikolwiek gracz
                     PlayerDto playerOnTile = state.Players.FirstOrDefault(p => p.X == x && p.Y == y);
-                    // Sprawdzamy czy na tym polu jest przeciwnik
                     EnemyDto enemyOnTile = state.Enemies.FirstOrDefault(e => e.X == x && e.Y == y);
 
                     if (playerOnTile != null)
                     {
-                        // Nasz gracz jest Cyan, inni gracze np. Żółci
                         Console.ForegroundColor = playerOnTile.Id == localPlayerId ? ConsoleColor.Cyan : ConsoleColor.Yellow;
                         Console.Write(playerOnTile.Symbol);
                         Console.ResetColor();
@@ -75,7 +68,6 @@ public class ConsoleView : IView
                 Console.WriteLine();
             }
 
-            // 2. RYSOWANIE UI NA PODSTAWIE DTO
             int uiColumn = state.MapWidth + 20;
             int clearWidth = 60;
 
@@ -93,7 +85,6 @@ public class ConsoleView : IView
                 Console.Write("=== LEGIOLAND (MAPA) ===".PadRight(clearWidth));
             }
 
-            // Wyciąganie itemów na ziemi z DTO
             var itemsOnGround = state.Map[myPlayer.X][myPlayer.Y].Items;
 
             for (int i = 0; i < Math.Max(5, itemsOnGround.Count); i++)

@@ -13,6 +13,7 @@ public class Player
 
     public int Points { get; set; } = 0; 
     public int Goals { get; set; } = 0;  
+    public string StatusMessage { get; set; } = "";
 
     public List<Items> Backpack { get; private set; } = new List<Items>();
 

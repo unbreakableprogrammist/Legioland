@@ -10,18 +10,17 @@ namespace Gra.Network;
 
 public class GameServer
 {
-    private GameModel _gameModel; // to jest ten obiekt ktory pakuje rzeczy do GameState i wysyla do wydrukowania
+    private GameModel _gameModel;
     private TcpListener _listener;
     private List<TcpClient>_clients = new List<TcpClient>();
     
-    private readonly object _lock = new object(); // taki ala mutex csharpowy 
+    private readonly object _lock = new object();
     private Dictionary<string, Func<ClientActionDto, Player, ICommand>> _commandFactory;
     
     public GameServer(GameModel model)
     {
         _gameModel = model;
             
-        // Rejestrujemy komendy
         _commandFactory = new Dictionary<string, Func<ClientActionDto, Player, ICommand>>
         {
             { "MOVE", (dto, p) => p.IsInCombatMode ? null : new MoveCommand(p, _gameModel.Dungeon, dto.Dx, dto.Dy) },
@@ -29,10 +28,10 @@ public class GameServer
             { "DROP", (dto, p) => p.IsInCombatMode ? null : new DropCommand(p, _gameModel.Dungeon) },
             
             { "ACTION_L", (dto, p) => p.IsInCombatMode 
-                ? new AttackCommand(p, _gameModel.Dungeon, false, msg => { /* Na razie ignorujemy logi walki */ }) 
+                ? new AttackCommand(p, _gameModel.Dungeon, false) 
                 : new EquipCommand(p, false) },
             { "ACTION_R", (dto, p) => p.IsInCombatMode 
-                ? new AttackCommand(p, _gameModel.Dungeon, true, msg => { }) 
+                ? new AttackCommand(p, _gameModel.Dungeon, true) 
                 : new EquipCommand(p, true) },
             
             { "INV_UP", (dto, p) => new InventoryUpCommand(p) },
@@ -52,40 +51,41 @@ public class GameServer
         _listener.Start();
         Console.WriteLine($"[SERWER] Uruchomiono na porcie {port}. Oczekuję na graczy...");
 
-        // Wątek, który co 2 sekundy rusza przeciwnikami i rozsyła nowy stan do graczy
         Task.Run(EnemyLoop);
 
         int playerIdCounter = 1;
 
-        // Główna pętla serwera - akceptuje nowych graczy (max 9)
         while (true)
         {
-            if (_clients.Count < 9)
+            TcpClient client = _listener.AcceptTcpClient();
+            bool isServerFull;
+            lock (_lock)
             {
-                TcpClient client = _listener.AcceptTcpClient();
+                isServerFull = _clients.Count >= 9;
+            }
+
+            if (isServerFull)
+            {
+                client.Close();
+                continue;
+            }
+                
+            int newPlayerId = playerIdCounter++;
+            StreamWriter writer = new StreamWriter(client.GetStream()) { AutoFlush = true };
+            writer.WriteLine(newPlayerId.ToString());
+
+            Console.WriteLine($"[SERWER] Dołączył Gracz {newPlayerId}!");
+            Gra.Logging.Logger.Instance.Log($"Gracz {newPlayerId} dołączył do gry!");
+
+            lock (_lock)
+            {
                 _clients.Add(client);
-                    
-                int newPlayerId = playerIdCounter++;
-                Console.WriteLine($"[SERWER] Dołączył Gracz {newPlayerId}!");
-
-                lock (_lock)
-                {
-                    // Dodajemy gracza do modelu na polu (0,0) - możesz to zmienić na inne współrzędne
-                    _gameModel.AddPlayer(newPlayerId, new Player(0, 0));
-                }
-
-                // Rozpoczynamy nasłuchiwanie tego gracza w tle (osobny Task dla każdego gracza!)
-                Task.Run(() => HandleClient(client, newPlayerId));
-                    
-                // Rozsyłamy nowy stan wszystkim, bo gracz dołączył
-                BroadcastState(); 
+                _gameModel.AddPlayer(newPlayerId, new Player(0, 0));
             }
-            else
-            {
-                // Serwer pełny, odrzucamy połączenie
-                TcpClient rejected = _listener.AcceptTcpClient();
-                rejected.Close();
-            }
+
+            Task.Run(() => HandleClient(client, newPlayerId));
+                
+            BroadcastState(); 
         }
     }
     private void HandleClient(TcpClient client, int playerId)
@@ -96,23 +96,23 @@ public class GameServer
                 while (true)
                 {
                     string json = reader.ReadLine();
-                    if (json == null) break; // Klient się rozłączył
+                    if (json == null) break;
 
                     ClientActionDto action = JsonSerializer.Deserialize<ClientActionDto>(json);
                     
-                    // Używamy zablokowania _stateLock, by nikt inny nie ruszał modelu w tym czasie
                     lock (_lock)
                     {
                         Player p = _gameModel.Players[playerId];
                         
-                        // Zamiast IF'a, pytamy fabryki o odpowiedni obiekt ICommand
                         if (_commandFactory.TryGetValue(action.ActionType, out var commandCreator))
                         {
                             ICommand cmd = commandCreator(action, p);
-                            cmd.Execute();
+                            if (cmd != null)
+                            {
+                                cmd.Execute();
+                            }
                         }
                     }
-                    // Po wykonaniu akcji rozsyłamy stan gry
                     BroadcastState();
                 }
             }
@@ -122,22 +122,23 @@ public class GameServer
             }
             finally
             {
+                Gra.Logging.Logger.Instance.Log($"Gracz {playerId} opuścił serwer.");
+
                 lock (_lock)
                 {
                     _gameModel.RemovePlayer(playerId);
                     _clients.Remove(client);
                 }
                 client.Close();
-                BroadcastState(); // Odświeżamy mapę bez tego gracza
+                BroadcastState();
             }
         }
 
-        // Metoda, która budzi przeciwników do ruchu
         private async Task EnemyLoop()
         {
             while (true)
             {
-                await Task.Delay(2000); // Co 2 sekundy ruch wrogów
+                await Task.Delay(2000);
                 lock (_lock)
                 {
                     _gameModel.MoveAllEnemies();
@@ -146,7 +147,6 @@ public class GameServer
             }
         }
 
-        // Metoda rozsyłająca DTO wszystkim podłączonym graczom
         private void BroadcastState()
         {
             GameStateDto dto;
@@ -157,18 +157,19 @@ public class GameServer
 
             string json = JsonSerializer.Serialize(dto);
 
-            // Wysłanie jsona do każdego klienta
-            foreach (var client in _clients)
+            lock (_lock)
             {
-                try
+                foreach (var client in _clients)
                 {
-                    StreamWriter writer = new StreamWriter(client.GetStream());
-                    writer.WriteLine(json);
-                    writer.Flush();
-                }
-                catch
-                {
-                    // Ignorujemy, rozłączenie zostanie obsłużone w HandleClient
+                    try
+                    {
+                        StreamWriter writer = new StreamWriter(client.GetStream());
+                        writer.WriteLine(json);
+                        writer.Flush();
+                    }
+                    catch
+                    {
+                    }
                 }
             }
         }

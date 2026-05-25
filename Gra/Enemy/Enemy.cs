@@ -6,7 +6,6 @@ namespace Gra;
 
 
 public abstract class Enemy : Gra.Observer.IObserver<SoundPayload>, Gra.Observer.IObserver<DeathPayload>{
-    // subskrybujemy oba kanaly 
     private protected ISubject<DeathPayload> _deathSubject;
     private protected ISubject<SoundPayload> _soundSubject ;
     private Dungeon _dungeon;

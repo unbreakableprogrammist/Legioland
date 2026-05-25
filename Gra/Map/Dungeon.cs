@@ -74,6 +74,6 @@ public class Dungeon
                 }
             }
         }
-        return -1; // Nie znaleziono drogi w podanym zasięgu
+        return -1;
     }
 }

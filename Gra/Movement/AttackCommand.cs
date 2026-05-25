@@ -8,14 +8,12 @@ public class AttackCommand : ICommand
     private Player _player;
     private Dungeon _dungeon;
     private bool _useRightHand;
-    private Action<string> _onMessage;
 
-    public AttackCommand(Player player, Dungeon dungeon, bool useRightHand, Action<string> onMessage)
+    public AttackCommand(Player player, Dungeon dungeon, bool useRightHand)
     {
         _player = player;
         _dungeon = dungeon;
         _useRightHand = useRightHand;
-        _onMessage = onMessage;
     }
 
     public void Execute()
@@ -53,7 +51,7 @@ public class AttackCommand : ICommand
             report += $"| Otrzymałeś {taken} obr.";
         }
 
-        _onMessage(report);
+        _player.StatusMessage = report;
         Logger.Instance.Log($"Atak na {target.Name}! Zadano {damage} obrażeń.");
     }
 }

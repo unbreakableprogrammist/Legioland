@@ -12,10 +12,8 @@ public class GameClient
     private StreamWriter _writer;
     private StreamReader _reader;
 
-    // Zmienne lokalne do rysowania UI (to też robił stary kontroler)
-    private int _myPlayerId = -1; // Na razie nie znamy swojego ID, serwer nam je nada
+    private int _myPlayerId = -1;
     private bool _showLogs = false;
-    private string _statusMessage = "";
 
     public GameClient(IView view)
     {
@@ -30,15 +28,14 @@ public class GameClient
             var stream = _client.GetStream();
             _writer = new StreamWriter(stream) { AutoFlush = true };
             _reader = new StreamReader(stream);
+            _myPlayerId = int.Parse(_reader.ReadLine());
 
             Console.WriteLine("Połączono z serwerem! Oczekiwanie na stan gry...");
             Console.Clear();
             Console.CursorVisible = false;
 
-            // 1. Wątek nasłuchujący: Odbiera mapę od Serwera i każe Widokowi ją narysować
             Task.Run(ListenToServer);
 
-            // 2. Główny wątek: "Lekki Kontroler", który czyta klawisze i wysyła je do Serwera
             InputLoop();
         }
         catch (Exception ex)
@@ -47,14 +44,12 @@ public class GameClient
         }
     }
 
-    // --- TO JEST TWOJA DAWNA PĘTLA Z KONTROLERA (Tylko teraz wysyła w kosmos) ---
     private void InputLoop()
     {
         while (true)
         {
             ConsoleKeyInfo keyInfo = Console.ReadKey(true);
 
-            // Klawisze lokalne (tylko UI), nie wysyłamy ich na serwer
             if (keyInfo.Key == ConsoleKey.J)
             {
                 _showLogs = !_showLogs;
@@ -66,9 +61,8 @@ public class GameClient
             {
                 Console.CursorVisible = true; 
                 Environment.Exit(0);
-            } // Wyjście
+            }
 
-            // Klawisze, które wymagają wysłania na Serwer
             ClientActionDto action = null;
 
             switch (keyInfo.Key)
@@ -80,7 +74,6 @@ public class GameClient
                 case ConsoleKey.E: action = new ClientActionDto { ActionType = "PICKUP" }; break;
                 case ConsoleKey.F: action = new ClientActionDto { ActionType = "DROP" }; break;
                 
-                // ZMIANA: Uniwersalne akcje dla rąk (Serwer sam zdecyduje czy to atak czy ekwipunek)
                 case ConsoleKey.L: action = new ClientActionDto { ActionType = "ACTION_L" }; break;
                 case ConsoleKey.R: action = new ClientActionDto { ActionType = "ACTION_R" }; break;
                 
@@ -89,7 +82,6 @@ public class GameClient
                 case ConsoleKey.LeftArrow: action = new ClientActionDto { ActionType = "GND_LEFT" }; break;
                 case ConsoleKey.RightArrow: action = new ClientActionDto { ActionType = "GND_RIGHT" }; break;
                 
-                // NOWE KLAWISZE WALKI:
                 case ConsoleKey.X: action = new ClientActionDto { ActionType = "TOGGLE_COMBAT" }; break;
                 case ConsoleKey.D1: action = new ClientActionDto { ActionType = "STYLE_1" }; break;
                 case ConsoleKey.D2: action = new ClientActionDto { ActionType = "STYLE_2" }; break;
@@ -98,14 +90,13 @@ public class GameClient
 
             if (action != null && _myPlayerId != -1)
             {
-                action.PlayerId = _myPlayerId; // Podpisujemy się, żeby serwer wiedział kto klika
+                action.PlayerId = _myPlayerId;
                 string json = JsonSerializer.Serialize(action);
-                _writer.WriteLine(json); // WYSYŁAMY DO SERWERA
+                _writer.WriteLine(json);
             }
         }
     }
 
-    // --- WĄTEK NASŁUCHUJĄCY (Odbiera DTO z sieci i rysuje) ---
     private async Task ListenToServer()
     {
         try
@@ -117,23 +108,19 @@ public class GameClient
  
                 GameStateDto state = JsonSerializer.Deserialize<GameStateDto>(json);
 
-                // Mały trik na początku: Jeśli serwer wysłał nam graczy, a my jeszcze nie 
-                // przypisaliśmy sobie ID, bierzemy najwyższe dostępne (serwer je nadaje po kolei).
-                if (_myPlayerId == -1 && state.Players.Count > 0)
-                {
-                    _myPlayerId = state.Players[state.Players.Count - 1].Id;
-                }
                 PlayerDto myPlayer = state.Players.FirstOrDefault(p => p.Id == _myPlayerId);
                 if (myPlayer != null && myPlayer.Health <= 0)
                 {
-                    // Odpalamy widok końca gry
+                    System.IO.File.WriteAllLines("logs.txt", state.Logs);
+
                     _view.ShowGameOver($"Gracz {_myPlayerId}", myPlayer.Points, myPlayer.Goals, "logs.txt", true);
-                    Console.CursorVisible = true; // Odnawiamy kursor
-                    Environment.Exit(0);          // Zamykamy Klienta
+                    Console.CursorVisible = true;
+                    Environment.Exit(0);
                 }
 
-                // Każe ConsoleView narysować nowy stan!
-                _view.Render(state, _myPlayerId, _statusMessage, _showLogs);
+                string currentStatus = myPlayer?.StatusMessage ?? "";
+
+                _view.Render(state, _myPlayerId, currentStatus, _showLogs);
             }
         }
         catch (Exception)
