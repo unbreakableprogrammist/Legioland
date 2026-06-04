@@ -31,8 +31,8 @@ public class MasterThemeFactory : IThemeFactory
     public Weapon CreateRandomWeapon(Random rnd)
     {
         int los = rnd.Next(3);
-        if (los == 0) return new LightWeapon("Paweł Wszołek", 'W', 50, false);   
-        if (los == 1) return new MagicWeapon("Kacper Urbański", 'U', 60, false); 
-        return new HeavyWeapon("Kamil Adamski", 'A', 70, true);                  
+        if (los == 0) return new LightWeapon("Paweł Wszołek", 'W', 50, false,3);   
+        if (los == 1) return new MagicWeapon("Kacper Urbański", 'U', 60, false,1); 
+        return new HeavyWeapon("Kamil Adamski", 'A', 70, true,5);                  
     }
 }

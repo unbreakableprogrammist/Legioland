@@ -32,8 +32,8 @@ public class RelegationThemeFactory : IThemeFactory
     public Weapon CreateRandomWeapon(Random rnd)
     {
         int los = rnd.Next(3);
-        if (los == 0) return new HeavyWeapon("Radovan Pankov", 'V', 50, true);   
-        if (los == 1) return new HeavyWeapon("Kamil Piatkowski", 'P', 60, true); 
-        return new MagicWeapon("Patryk Kun", 'K', 70, false);                  
+        if (los == 0) return new HeavyWeapon("Radovan Pankov", 'V', 50, true,5);   
+        if (los == 1) return new HeavyWeapon("Kamil Piatkowski", 'P', 60, true,3); 
+        return new MagicWeapon("Patryk Kun", 'K', 70, false,1);                  
     }
 }

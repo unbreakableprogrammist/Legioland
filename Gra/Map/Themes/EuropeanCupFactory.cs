@@ -32,8 +32,8 @@ public class EuropeanCupFactory : IThemeFactory
     public Weapon CreateRandomWeapon(Random rnd)
     {
         int los = rnd.Next(3);
-        if (los == 0) return new MagicWeapon("Juergen Elitim", 'E', 70, false);     
-        if (los == 1) return new HeavyWeapon("Jean-Pierre Nsame", 'N', 80, true);   
-        return new LightWeapon("Vahan Bichakhchyan", 'V', 65, false);               
+        if (los == 0) return new MagicWeapon("Juergen Elitim", 'E', 70, false,2);     
+        if (los == 1) return new HeavyWeapon("Jean-Pierre Nsame", 'N', 80, true,5);   
+        return new LightWeapon("Vahan Bichakhchyan", 'V', 65, false,3);               
     }
 }

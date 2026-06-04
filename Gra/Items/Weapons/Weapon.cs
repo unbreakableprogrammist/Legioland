@@ -4,18 +4,36 @@ namespace Gra;
 public abstract class Weapon : Items 
 {
     public bool IsTwoHanded { get; private set; } 
-    
+    public int MaxSlots { get; private set; } 
+    private List<Items> _slottedItems = new List<Items>();
     private char _symbol; 
     private string _baseName; 
     public abstract int NoiseRange { get; } 
+    public override bool CanBeSlotted => false; 
 
-    public Weapon(string name, char symbol, int damage, bool isTwoHanded) 
+    public Weapon(string name, char symbol, int damage, bool isTwoHanded, int maxSlots = 0) 
     {
         _baseName = name; 
         _symbol = symbol;
         Damage = damage; 
         IsTwoHanded = isTwoHanded;
+        MaxSlots = maxSlots;
     }
+    public override int StrengthModifier => _slottedItems.Sum(i => i.StrengthModifier);
+    public override int DexterityModifier => _slottedItems.Sum(i => i.DexterityModifier);
+    public override int WisdomModifier => _slottedItems.Sum(i => i.WisdomModifier);
+    public override int LuckModifier => _slottedItems.Sum(i => i.LuckModifier);
+    public override bool AddToSlot(Items item)
+    {
+        if (item.CanBeSlotted && _slottedItems.Count < MaxSlots)
+        {
+            _slottedItems.Add(item);
+            return true;
+        }
+        return false;
+    }
+
+    public override List<Items> GetSlottedItems() => _slottedItems;
     public abstract string TypBroni { get; }
     public override string Name => $"{_baseName} ({TypBroni}) [Atk: {Damage}]";
     public override char GetSymbol() => _symbol; 

@@ -4,7 +4,7 @@ public class HeavyWeapon : Weapon
 {
     public override string TypBroni => "Ciężka";
     public override int NoiseRange => 15;
-    public HeavyWeapon(string name, char symbol, int damage, bool isTwoHanded) 
+    public HeavyWeapon(string name, char symbol, int damage, bool isTwoHanded,int maxSlots = 0) 
         : base(name, symbol, damage, isTwoHanded) { }
 
     public override int AcceptAttack(IAttackVisitor visitor) => visitor.Visit(this);
