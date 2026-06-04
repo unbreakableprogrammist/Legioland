@@ -14,13 +14,13 @@ public class GameServer
     private TcpListener _listener;
     private List<TcpClient>_clients = new List<TcpClient>();
     
-    private readonly object _lock = new object();
-    private Dictionary<string, Func<ClientActionDto, Player, ICommand>> _commandFactory;
+    private readonly object _lock = new object(); // ala mutex 
+    private Dictionary<string, Func<ClientActionDto, Player, ICommand>> _commandFactory;// nazwa akci -> funkcja 
     
     public GameServer(GameModel model)
     {
         _gameModel = model;
-            
+        
         _commandFactory = new Dictionary<string, Func<ClientActionDto, Player, ICommand>>
         {
             { "MOVE", (dto, p) => p.IsInCombatMode ? null : new MoveCommand(p, _gameModel.Dungeon, dto.Dx, dto.Dy) },
