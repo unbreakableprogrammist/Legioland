@@ -220,4 +220,32 @@ public class DungeonBuilder : IDungeonBuilder
         _dungeon.Grid[1, 1] = new EmptyCell(1, 1);
         return _dungeon;
     }
+    
+    public IDungeonBuilder AddSlottedItems()
+    {
+        List<Items> specialItems = new List<Items>
+        {
+            new HeavyWeapon("Legendarny Miecz", 'W', 40, false, maxSlots: 5), 
+            new Grip("Złoty Uchwyt", 'U', maxSlots: 2),                       
+            new Grip("Srebrny Uchwyt", 'u', maxSlots: 1),                     
+            new PassiveItem("Kamień Siły", 'K', str: 5),                      
+            new PassiveItem("Oko Proroka", 'O', wis: 5),                      
+            new PassiveItem("Klejnot Szczęścia", 'S', luk: 10)
+        };
+
+        foreach (var item in specialItems)
+        {
+            while (true) 
+            {
+                int x = _rnd.Next(0, _dungeon.Width);
+                int y = _rnd.Next(0, _dungeon.Height);
+                if (_dungeon.Grid[x, y].IsPassable())
+                {
+                    _dungeon.Grid[x, y] = _dungeon.Grid[x, y].ReceiveItem(item);
+                    break;
+                }
+            }
+        }
+        return this;
+    }
 }

@@ -1,3 +1,4 @@
+using Gra.Behaviors;
 using Gra.Logging;
 using Gra.Map;
 using Gra.Observer;
@@ -7,7 +8,7 @@ namespace Gra;
 public class OfficialEnemy : Enemy
 {
     public OfficialEnemy(int x, int y, string name, char symbol, int health, int damage, int armor, IDefenseVisitor attackStyle, ISubject<DeathPayload> deathSubject, ISubject<SoundPayload> soundSubject, Dungeon dungeon) 
-        : base(x, y, deathSubject, soundSubject, dungeon)
+        : base(x, y, deathSubject, soundSubject, dungeon, health)
     {
         Name = name;
         Symbol = symbol;
@@ -15,6 +16,8 @@ public class OfficialEnemy : Enemy
         BaseDamage = damage;
         Armor = armor;
         AttackStyle = attackStyle;
+        this.CurrentBehavior = new CowardlyBehavior();
+        Health = health;
     }
 
     public override void OnNotify(DeathPayload message)

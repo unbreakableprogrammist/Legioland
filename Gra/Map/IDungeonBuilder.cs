@@ -11,6 +11,7 @@ public interface IDungeonBuilder
     IDungeonBuilder AddItems(int lenght);
     IDungeonBuilder AddWeapons(int lenght);
     IDungeonBuilder AddEnemies(int lenght); 
+    IDungeonBuilder AddSlottedItems();
 
     Dungeon GetResult();
 }

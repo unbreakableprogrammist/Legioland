@@ -23,6 +23,9 @@ public class PlayerDto
     public int Goals { get; set; }
     public string StatusMessage { get; set; }
     public int Strength { get; set; }
+    public int TotalStrength { get; set; }
+    public int TotalDexterity { get; set; }
+    public int TotalWisdom { get; set; }
     public int TotalLuck { get; set; }
     public int Wisdom { get; set; }
         

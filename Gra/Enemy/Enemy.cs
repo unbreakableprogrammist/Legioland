@@ -1,3 +1,4 @@
+using Gra.Behaviors;
 using Gra.Logging;
 using Gra.Map;
 using Gra.Observer;
@@ -16,11 +17,14 @@ public abstract class Enemy : Gra.Observer.IObserver<SoundPayload>, Gra.Observer
     public int BaseDamage { get; protected set; }
     public int X { get; set; }
     public int Y { get; set; }
-
+    public int MaxHealth { get; protected set; }
+    
+    public IEnemyBehavior CurrentBehavior { get; set; } = new RandomBehavior();
+    public SoundPayload LastHeardSound { get; set; } = null; 
     
     public IDefenseVisitor AttackStyle { get; protected set; }
 
-    public Enemy(int x, int y,ISubject<DeathPayload> deathSubject,ISubject<SoundPayload> soundSubject,Dungeon dungeon)
+    public Enemy(int x, int y,ISubject<DeathPayload> deathSubject,ISubject<SoundPayload> soundSubject,Dungeon dungeon,int health)
     {
         X = x;
         Y = y;
@@ -29,16 +33,25 @@ public abstract class Enemy : Gra.Observer.IObserver<SoundPayload>, Gra.Observer
         _dungeon = dungeon;
         _soundSubject.Attach(this);
         _deathSubject.Attach(this);
+        
+        Health = health; 
+        MaxHealth = health; 
+    }
+
+    public virtual void TakeDamage(int damage)
+    {
+        Health -= damage;
     }
 
     public abstract void OnNotify(DeathPayload message);
 
     public virtual void OnNotify(SoundPayload message)
     {
-        int distance = _dungeon.CalculatePathDistance(X,Y,message.SourceX, message.SourceY,message.Range);
+        int distance = _dungeon.CalculatePathDistance(X, Y, message.SourceX, message.SourceY, message.Range);
         if (distance != -1 && distance <= message.Range)
         {
-            Logger.Instance.Log($"[DŹWIĘK] {Name} na pozycji ({X},{Y}) usłyszał hałas z ({message.SourceX},{message.SourceY}). Odległość: {distance}.");
+            LastHeardSound = message; 
+            Logger.Instance.Log($"[DŹWIĘK] {Name} na pozycji ({X},{Y}) usłyszał hałas z ({message.SourceX},{message.SourceY}).");
         }
     }
 
@@ -51,25 +64,9 @@ public abstract class Enemy : Gra.Observer.IObserver<SoundPayload>, Gra.Observer
         _soundSubject.Detach(this);
     }
 
-    public virtual void Move()
+    public virtual void Move(Dictionary<int, Player> players)
     {
-        if(IsDead) return;
-        
-        int[] dx = { 0, 0, 1, -1};
-        int[] dy = { 1, -1, 0, 0};
-
-        Random rnd = new Random();
-        int direction = rnd.Next(4);
-        
-        int newX = X + dx[direction];
-        int newY = Y + dy[direction];
-
-        if (newX >= 0 && newX < _dungeon.Width && newY >= 0 && newY < _dungeon.Height &&
-            _dungeon.Grid[newX, newY].IsPassable())
-        {
-            X = newX;
-            Y = newY;
-            Logger.Instance.Log($"Potwor przesunal sie na pole {X},{Y}");
-        }        
+        if (IsDead) return;
+        CurrentBehavior.ExecuteTurn(this, _dungeon, players);
     }
 }

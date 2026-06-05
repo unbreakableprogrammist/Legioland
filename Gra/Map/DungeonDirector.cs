@@ -12,7 +12,8 @@ namespace Gra.Map
                 .AddCorridors(100)                 
                 .AddItems(15)                      
                 .AddWeapons(4)
-                .AddEnemies(6) 
+                .AddEnemies(6)
+                .AddSlottedItems()
                 .GetResult();                      
         }
 

@@ -42,7 +42,9 @@ public class GameServer
             { "TOGGLE_COMBAT", (dto, p) => new ToggleCombatCommand(p, _gameModel.Dungeon) },
             { "STYLE_1", (dto, p) => new ChangeStyleCommand(p, new AtakZwyklyVisitor()) },
             { "STYLE_2", (dto, p) => new ChangeStyleCommand(p, new AtakSkrytyVisitor()) },
-            { "STYLE_3", (dto, p) => new ChangeStyleCommand(p, new AtakMagicznyVisitor()) }
+            { "STYLE_3", (dto, p) => new ChangeStyleCommand(p, new AtakMagicznyVisitor()) },
+            { "SLOT_L", (dto, p) => p.IsInCombatMode ? null : new SlotItemCommand(p, true) },
+            { "SLOT_R", (dto, p) => p.IsInCombatMode ? null : new SlotItemCommand(p, false) },
         };
     }
     public void Start(int port)

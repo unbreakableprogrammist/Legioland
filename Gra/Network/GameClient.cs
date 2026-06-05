@@ -32,6 +32,7 @@ public class GameClient
 
             Console.WriteLine("Połączono z serwerem! Oczekiwanie na stan gry...");
             Console.Clear();
+            _view.ShowIntro("Witaj w Legiolandzie! Czas rozpocząć mecz...");
             Console.CursorVisible = false;
 
             Task.Run(ListenToServer);
@@ -86,6 +87,8 @@ public class GameClient
                 case ConsoleKey.D1: action = new ClientActionDto { ActionType = "STYLE_1" }; break;
                 case ConsoleKey.D2: action = new ClientActionDto { ActionType = "STYLE_2" }; break;
                 case ConsoleKey.D3: action = new ClientActionDto { ActionType = "STYLE_3" }; break;
+                case ConsoleKey.Y: action = new ClientActionDto { ActionType = "SLOT_L" }; break;
+                case ConsoleKey.U: action = new ClientActionDto { ActionType = "SLOT_R" }; break;
             }
 
             if (action != null && _myPlayerId != -1)

@@ -23,13 +23,13 @@ public class AttackCommand : ICommand
         Items weapon = _useRightHand ? _player.RightHand : _player.LeftHand;
         int damage = (weapon != null) ? weapon.AcceptAttack(_player.CurrentAttack) : _player.Strength / 2;
         
-        target.Health -= damage;
+        target.TakeDamage(damage);
         string report = $"Zadałeś {damage} obr. ";
 
         if (target.IsDead) 
         {
             report += "Wróg pokonany!";
-            
+            target.Die();
         }
         else 
         {

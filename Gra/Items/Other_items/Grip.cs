@@ -3,15 +3,20 @@ namespace Gra;
 public class Grip : Items
 {
     private char _symbol;
+    private string _baseName;
     public int MaxSlots { get; private set; }
     private List<Items> _slottedItems = new List<Items>();
 
     public Grip(string name, char symbol, int maxSlots)
     {
-        Name = name;
+        _baseName = name;
         _symbol = symbol;
         MaxSlots = maxSlots;
     }
+    public override string Name => _slottedItems.Any()
+        ? $"{_baseName} <Zawiera: {string.Join(", ", _slottedItems.Select(i => i.Name))}>"
+        : _baseName;
+
     public override int StrengthModifier => _slottedItems.Sum(i => i.StrengthModifier);
     public override int DexterityModifier => _slottedItems.Sum(i => i.DexterityModifier);
     public override int WisdomModifier => _slottedItems.Sum(i => i.WisdomModifier);

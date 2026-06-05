@@ -16,7 +16,7 @@ public class MasterThemeFactory : IThemeFactory
     {
         int los = rnd.Next(3);
         if (los == 0) return new ThemedEnemy(x, y, "Lech Poznań", 'L', 150, 40, 20, new ObronaPrzedZwyklymVisitor(), deathNetwork, soundNetwork, dungeon);
-        if (los == 1) return new ThemedEnemy(x, y, "Jagiellonia Białystok", 'J', 140, 35, 15, new ObronaPrzedSkrytymVisitor(), deathNetwork, soundNetwork, dungeon);
+        if (los == 1) return new NeutralEnemy(x, y, "Jagiellonia Białystok", 'J', 140, 15, 35, new ObronaPrzedSkrytymVisitor(), deathNetwork, soundNetwork, dungeon);
         return new ThemedEnemy(x, y, "Raków Częstochowa", 'R', 160, 1, 100, new ObronaPrzedZwyklymVisitor(), deathNetwork, soundNetwork, dungeon);
     }
 

@@ -35,7 +35,9 @@ public abstract class Weapon : Items
 
     public override List<Items> GetSlottedItems() => _slottedItems;
     public abstract string TypBroni { get; }
-    public override string Name => $"{_baseName} ({TypBroni}) [Atk: {Damage}]";
+    public override string Name => _slottedItems.Any()
+        ? $"{_baseName} ({TypBroni}) [Atk: {Damage}] <Zawiera: {string.Join(", ", _slottedItems.Select(i => i.Name))}>"
+        : $"{_baseName} ({TypBroni}) [Atk: {Damage}]";
     public override char GetSymbol() => _symbol; 
 
     public abstract int AcceptAttack(IAttackVisitor visitor);

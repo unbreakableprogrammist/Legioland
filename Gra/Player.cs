@@ -14,6 +14,10 @@ public class Player
     public int Points { get; set; } = 0; 
     public int Goals { get; set; } = 0;  
     public string StatusMessage { get; set; } = "";
+    public int TotalStrength => Strength + (LeftHand?.StrengthModifier ?? 0) + (RightHand != LeftHand ? RightHand?.StrengthModifier ?? 0 : 0);
+    public int TotalDexterity => Dexterity + (LeftHand?.DexterityModifier ?? 0) + (RightHand != LeftHand ? RightHand?.DexterityModifier ?? 0 : 0);
+    public int TotalWisdom => Wisdom + (LeftHand?.WisdomModifier ?? 0) + (RightHand != LeftHand ? RightHand?.WisdomModifier ?? 0 : 0);
+    public int TotalLuck => Luck + (LeftHand?.LuckModifier ?? 0) + (RightHand != LeftHand ? RightHand?.LuckModifier ?? 0 : 0);
 
     public List<Items> Backpack { get; private set; } = new List<Items>();
 

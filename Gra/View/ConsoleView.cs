@@ -102,10 +102,10 @@ public class ConsoleView : IView
             Console.Write($"PUNKTY: {myPlayer.Points}  GOLE: {myPlayer.Goals}".PadRight(clearWidth));
 
             Console.SetCursorPosition(uiColumn, 8);
-            Console.Write($"HP: {myPlayer.Health}   STRENGHT : {myPlayer.Strength}".PadRight(clearWidth));
+            Console.Write($"HP: {myPlayer.Health}   STRENGHT : {myPlayer.TotalStrength}".PadRight(clearWidth));
 
             Console.SetCursorPosition(uiColumn, 9);
-            Console.Write($"Luck: {myPlayer.TotalLuck}  Wisdom: {myPlayer.Wisdom}".PadRight(clearWidth));
+            Console.Write($"Luck: {myPlayer.TotalLuck}  Wisdom: {myPlayer.TotalWisdom}".PadRight(clearWidth));
 
             Console.SetCursorPosition(uiColumn, 10);
             Console.ForegroundColor = ConsoleColor.Magenta;
@@ -156,10 +156,11 @@ public class ConsoleView : IView
     {
         Console.Clear();
         Console.ForegroundColor = ConsoleColor.Green;
+        string introPath = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Intro.txt");
 
-        if (File.Exists("Intro.txt"))
+        if (File.Exists(introPath))
         {
-            string logo = File.ReadAllText("Intro.txt");
+            string logo = File.ReadAllText(introPath);
             Console.WriteLine(logo);
         }
         else
@@ -206,6 +207,8 @@ public class ConsoleView : IView
         Console.WriteLine("[F]               - Wyrzucenie przedmiotu z plecaka");
         Console.WriteLine("[L]               - Wyposażenie w lewą rękę");
         Console.WriteLine("[R]               - Wyposażenie w prawą rękę");
+        Console.WriteLine("[Y]               - Włóż przedmiot z plecaka do broni w lewej ręce (Slot)");
+        Console.WriteLine("[U]               - Włóż przedmiot z plecaka do broni w prawej ręce (Slot)");
         Console.WriteLine("[1, 2, 3]         - Zmiana stylu walki (Zwykły/Skryty/Magiczny)");
         Console.WriteLine("[X]               - Wejście/Wyjście z trybu walki");
         Console.WriteLine("[Q]               - Poddanie meczu (Wyjście)");
@@ -213,6 +216,7 @@ public class ConsoleView : IView
         Console.WriteLine("\n\nWszystko jasne? Ruszajmy na boisko!");
         Console.WriteLine("Naciśnij dowolny klawisz, aby wybiec z tunelu...");
         Console.ReadKey(true);
+        Console.Clear();
     }
 
     public void ShowGameOver(string playerName, int points, int goals, string logFilePath, bool isDead)
@@ -220,9 +224,11 @@ public class ConsoleView : IView
         Console.CursorVisible = true;
         Console.Clear();
         Console.ForegroundColor = ConsoleColor.Red;
-        if (File.Exists("end.txt"))
+        string endPath = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "end.txt");
+
+        if (File.Exists(endPath))
         {
-            Console.WriteLine(File.ReadAllText("end.txt"));
+            Console.WriteLine(File.ReadAllText(endPath));
         }
         else
         {

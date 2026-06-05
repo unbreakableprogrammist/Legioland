@@ -35,7 +35,14 @@ public class GameModel
     {
         foreach (var enemy in Dungeon.Enemies)
         {
-            if (!enemy.IsDead) enemy.Move();
+            if (!enemy.IsDead)
+            {
+                bool isEngaged = Players.Values.Any(p => p.X == enemy.X && p.Y == enemy.Y && p.IsInCombatMode);
+                if (!isEngaged)
+                {
+                    enemy.Move(Players);
+                }
+            }
         }
     }
 
@@ -71,7 +78,7 @@ public class GameModel
                 Goals = p.Goals,
                 StatusMessage = p.StatusMessage,
                 Strength = p.Strength,
-                TotalLuck = currentLuck,
+                TotalLuck = p.TotalLuck,
                 Wisdom = p.Wisdom,
                 AttackStyleName = p.CurrentAttack.GetType().Name,
                 LeftHandName = p.LeftHand?.Name ?? "Pusta",
@@ -79,7 +86,10 @@ public class GameModel
                 BackpackNames = p.Backpack.Select(i => i.Name).ToList(),
                 IsInCombatMode = p.IsInCombatMode,
                 SelectedInventorySlot = p.SelectedInventorySlot,
-                SelectedGroundSlot = p.SelectedGroundSlot
+                SelectedGroundSlot = p.SelectedGroundSlot,
+                TotalStrength = p.TotalStrength,
+                TotalWisdom = p.TotalWisdom,
+                TotalDexterity = p.TotalDexterity
             });
         }
 
